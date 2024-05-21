@@ -1,0 +1,30 @@
+{
+    "arc": {
+        "arc_e": {
+            "num_fewshot": 0,
+            "limit": null
+        },
+        "arc_c": {
+            "num_fewshot": 25,
+            "limit": null
+        }
+    },
+    "commonsenseqa": {
+        "num_fewshot": 7
+    },
+    "gsm8k": {
+        "num_fewshot": 8
+    },
+    "hellaswag": {
+        "num_fewshot": 4
+    },
+    "humaneval": {
+        "limit": null
+    },
+    "mmlu": {
+        "num_fewshot": 5
+    },
+    "winogrande": {
+        "num_fewshot": 5
+    }
+}

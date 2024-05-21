@@ -1,0 +1,13 @@
+{
+    "subjects": [
+        "arc_e", "arc_c"
+    ],
+    "arc_e": {
+        "num_fewshot": 0,
+        "limit": null
+    },
+    "arc_c": {
+        "num_fewshot": 25,
+        "limit": null
+    }
+}
