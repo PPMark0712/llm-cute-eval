@@ -1,7 +1,6 @@
 # Byte-compiled / optimized / DLL files
 data/
 output/
-config_debug.json
 __pycache__/
 *.py[cod]
 *$py.class
