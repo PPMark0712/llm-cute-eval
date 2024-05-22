@@ -5,6 +5,7 @@ def match_answer_hellaswag(infer_result:dict, round_idx:int, args):
     correct_cnt = 0
     for item in infer_result["hellaswag"]:
         model_answer = find_first_selection(item[f"infer_round{round_idx}"])
+        item[f"extract_answer_round{round_idx}"] = model_answer
         if model_answer == item["ans"]:
             correct_cnt += 1
     result["hellaswag"] = {

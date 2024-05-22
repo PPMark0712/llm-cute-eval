@@ -63,9 +63,11 @@ def load_data_arc(args):
         for item in subject_data:
             fewshot_prompt = load_fewshot_data(dev_data[subject], cur_fewshot_begin_idx, task_config[subject]["num_fewshot"])
             cur_fewshot_begin_idx += task_config[subject]["num_fewshot"]
-            prompt = arc_instruction + fewshot_prompt + format_arc_query(item, False)
+            prompt = format_arc_query(item, False)
             task_data[subject].append({
                 **item,
+                "instruction": arc_instruction,
+                "fewshot_prompt": fewshot_prompt,
                 "prompt_round1": prompt,
             })
     return task_data

@@ -2,11 +2,11 @@
     "arc": {
         "arc_e": {
             "num_fewshot": 0,
-            "limit": 1
+            "limit": 5
         },
         "arc_c": {
             "num_fewshot": 25,
-            "limit": 1
+            "limit": 5
         }
     },
     "commonsenseqa": {
@@ -22,7 +22,7 @@
         "limit": 1
     },
     "humaneval": {
-        "limit": 1
+        "limit": 5
     },
     "mmlu": {
         "num_fewshot": 5,

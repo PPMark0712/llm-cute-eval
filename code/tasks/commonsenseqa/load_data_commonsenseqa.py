@@ -53,9 +53,11 @@ def load_data_commonsenseqa(args):
     for item in test_data:
         fewshot_prompt = get_fewshot_prompt_commonsenseqa(train_data, cur_fewshot_begin_idx, task_config["num_fewshot"])
         cur_fewshot_begin_idx += task_config["num_fewshot"]
-        prompt = cqa_instruction + fewshot_prompt + format_cqa_query(item, False)
+        prompt = format_cqa_query(item, False)
         data.append({
             **item,
+            "instruction": cqa_instruction,
+            "fewshot_prompt": fewshot_prompt,
             "prompt_round1": prompt,
         })
     task_data = {"commonsenseqa": data}

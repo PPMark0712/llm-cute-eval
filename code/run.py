@@ -18,6 +18,8 @@ def initialize(args):
         args.sampling_params = json.loads(args.sampling_params)
     
     # init task config
+    if "all" in args.tasks:
+        args.tasks = TASK_LIST
     with open(args.config_path, "r") as f:
         args.tasks_config = json.load(f)
     for task in args.tasks:
@@ -71,11 +73,17 @@ def run_infer(tasks_data:dict, model:LLM, sampling_params:SamplingParams, args):
         for task in tasks_data:
             for subject in tasks_data[task]:
                 for item in tasks_data[task][subject]:
-                    history = []
-                    for i in range(1, round_idx):
-                        history.append((item[f"prompt_round{i}"], item[f"infer_round{i}"]))
-                    query = item[f"prompt_round{round_idx}"]
-                    prompt = MODEL_FORMAT[args.model_type](query, history)
+                    if round_idx == 1:
+                        prompt = item["instruction"] + item["fewshot_prompt"] + item["prompt_round1"]
+                    else:                    
+                        history = []
+                        for i in range(1, round_idx):
+                            if i == 1:
+                                history.append((item["instruction"] + item["fewshot_prompt"] + item[f"prompt_round{i}"], item[f"infer_round{i}"]))
+                            else:
+                                history.append((item[f"prompt_round{i}"], item[f"infer_round{i}"]))
+                        query = item[f"prompt_round{round_idx}"]
+                        prompt = MODEL_FORMAT[args.model_type](query, history)
                     prompts.append(prompt)
 
         outputs = model.generate(prompts, sampling_params)
@@ -103,7 +111,7 @@ def run_infer(tasks_data:dict, model:LLM, sampling_params:SamplingParams, args):
         for task in tasks_data:
             for subject in tasks_data[task]:
                 for item in tasks_data[task][subject]:
-                    item[f"prompt_round{round_idx + 1}"] = args.refine_prompt 
+                    item[f"prompt_round{round_idx + 1}"] = args.refine_prompt
     
     return infer_result
 
@@ -137,7 +145,7 @@ def save_result(infer_result:dict, score:dict, args):
     # save evaluation result
     summary_score = {}
     for task in args.tasks:
-        for subject in score[task]:
+        for subject in score["round1"][task].keys():
             subject_result_path = os.path.join(args.save_path, "eval_result", task)
             subject_result = {}
             for round_idx in range(1, args.rounds + 1):
@@ -169,7 +177,7 @@ def get_args():
     parser.add_argument("--save_name", type=str)
     parser.add_argument("--save_infer_results", action="store_true")
     parser.add_argument("--sampling_params", type=str, default=None)
-    parser.add_argument("--refine_prompt", type=str, default="Please further think about and give me a more precise and professional answer.\nThe answer is ")
+    parser.add_argument("--refine_prompt", type=str, default="Please further think about and give me a more precise and professional answer.\n")
     parser.add_argument("--temp_file_path", type=str, default="temp_file")
     args = parser.parse_args()
     return args

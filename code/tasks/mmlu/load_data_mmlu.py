@@ -46,6 +46,14 @@ def load_file_mmlu(fn, limit=0):
     return data
 
 
+def get_inst_and_fewshot_cot(fewshot_data, subject):
+    text = fewshot_data[subject].strip()
+    idx = text.find("Q:")
+    instruction = text[:idx]
+    fewshot_cot_prompt = text[idx:]
+    return instruction, fewshot_cot_prompt
+
+
 def load_data_mmlu(args):
     task_config = args.tasks_config["mmlu"]
     fewshot_fn = os.path.join(mmlu_dir, "fewshot-cot", "mmlu-cot-claude-multiple.json")
@@ -58,12 +66,14 @@ def load_data_mmlu(args):
     for subject in subjects:
         fn = os.path.join(mmlu_dir, "test", f"{subject}_test.csv")
         subject_data = load_file_mmlu(fn, task_config["limit"])
-        fewshot_prompt = fewshot_data[subject].strip()
+        instruction, fewshot_cot_prompt = get_inst_and_fewshot_cot(fewshot_data, subject)
         task_data[subject] = []
         for item in subject_data:
-            prompt = fewshot_prompt + "\n\n\n" + format_query_mmlu(item)
+            prompt = format_query_mmlu(item)
             task_data[subject].append({
                 **item,
+                "instruction": instruction,
+                "fewshot_prompt": fewshot_cot_prompt,
                 "prompt_round1": prompt,
             })
     return task_data

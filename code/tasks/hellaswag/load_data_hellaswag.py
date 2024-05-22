@@ -52,9 +52,11 @@ def load_data_hellaswag(args):
     fewshot_prompt = get_fewshot_prompt_hellaswag(task_config["num_fewshot"])
     data = []
     for item in test_data:
-        prompt = hellaswag_instruction + fewshot_prompt + format_query_hellaswag(item, False)
+        prompt = format_query_hellaswag(item, False)
         data.append({
             **item,
+            "instruction": hellaswag_instruction,
+            "fewshot_prompt": fewshot_prompt,
             "prompt_round1": prompt,
         })
     task_data = {"hellaswag": data}

@@ -1,7 +1,7 @@
 import os, json
 
 gsm8k_dir = os.path.join("data", "tasks", "gsm8k")
-gsm8k_inst = "Solve the following math questions. Please think step by step and finally give the answer.\n\n"
+gsm8k_instruction = "Solve the following math questions. Please think step by step and finally give the answer.\n\n"
 
 def load_file_gsm8k(fn, limit=0):
     data = []
@@ -44,6 +44,11 @@ def load_data_gsm8k(args):
     task_data = {"gsm8k": []}
     fewshot_prompt = get_fewshot_cot_prompt_gsm8k(task_config["num_fewshot"])
     for item in test_data:
-        prompt = gsm8k_inst + fewshot_prompt + "Question: " + item["question"] + "\nAnswer: Let's think step by step\n"
-        task_data["gsm8k"].append({**item, "prompt_round1": prompt})
+        prompt = "Question: " + item["question"] + "\nAnswer: Let's think step by step\n"
+        task_data["gsm8k"].append({
+            **item, 
+            "instruction": gsm8k_instruction,
+            "fewshot_prompt": fewshot_prompt,
+            "prompt_round1": prompt,
+        })
     return task_data

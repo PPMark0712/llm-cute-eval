@@ -58,10 +58,11 @@ def load_data_winogrande(args):
     fewshot_cot_prompt = get_fewshot_cot_prompt_winogrande()
     data = []
     for item in test_data:
-        # prompt = winogrande_instruction + fewshot_prompt + format_query_winogrande(item, False)
-        prompt = winogrande_instruction + fewshot_cot_prompt + format_query_winogrande(item, False) + " Let's think step by step.\n"
+        prompt = format_query_winogrande(item, False) + " Let's think step by step.\n"
         data.append({
             **item,
+            "instruction": winogrande_instruction,
+            "fewshot_prompt": fewshot_cot_prompt,
             "prompt_round1": prompt,
         })
     task_data = {"winogrande": data}
