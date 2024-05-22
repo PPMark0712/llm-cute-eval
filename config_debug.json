@@ -11,25 +11,25 @@
     },
     "commonsenseqa": {
         "num_fewshot": 7,
-        "limit": 1
+        "limit": 5
     },
     "gsm8k": {
         "num_fewshot": 8,
-        "limit": 1
+        "limit": 5
     },
     "hellaswag": {
         "num_fewshot": 4,
-        "limit": 1
+        "limit": 5
     },
     "humaneval": {
         "limit": 5
     },
     "mmlu": {
         "num_fewshot": 5,
-        "limit": 1
+        "limit": 4
     },
     "winogrande": {
         "num_fewshot": 5,
-        "limit": 1
+        "limit": 5
     }
 }
