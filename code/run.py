@@ -77,12 +77,8 @@ def run_infer(tasks_data:dict, model:LLM, sampling_params:SamplingParams, args):
                         prompt = item["instruction"] + item["fewshot_prompt"] + item["prompt_round1"]
                     else:                    
                         history = []
-                        for i in range(1, round_idx):
-                            if i == 1:
-                                history.append((item["instruction"] + item["fewshot_prompt"] + item[f"prompt_round{i}"], item[f"infer_round{i}"]))
-                            else:
-                                history.append((item[f"prompt_round{i}"], item[f"infer_round{i}"]))
-                        query = item[f"prompt_round{round_idx}"]
+                        history.append((item[f"prompt_round{1}"], item[f"infer_round{round_idx-1}"]))
+                        query = item[f"prompt_round{round_idx}"]    
                         prompt = MODEL_FORMAT[args.model_type](query, history)
                     prompts.append(prompt)
 

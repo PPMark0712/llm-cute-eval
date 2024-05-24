@@ -1,11 +1,13 @@
 TASK_LIST = [
     "arc",
     "commonsenseqa",
+    "drop"
     "gsm8k",
     "hellaswag",
     "humaneval",
     "mmlu",
     "winogrande",
+    "xsum",
 ]
 
 TASKS_SUBJECTS = {

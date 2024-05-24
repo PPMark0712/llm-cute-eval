@@ -13,6 +13,10 @@
         "num_fewshot": 7,
         "limit": 5
     },
+    "drop": {
+        "num_fewshot": 5,
+        "limit": 100
+    },
     "gsm8k": {
         "num_fewshot": 8,
         "limit": 5
@@ -31,5 +35,9 @@
     "winogrande": {
         "num_fewshot": 5,
         "limit": 5
+    },
+    "xsum":{
+        "num_fewshot": 5,
+        "limit": 100
     }
 }
