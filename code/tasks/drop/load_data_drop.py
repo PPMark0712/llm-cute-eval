@@ -3,6 +3,7 @@ import os, json
 drop_dir = os.path.join("data", "tasks", "drop")
 drop_instruction = "You will be asked to read a passage and answer a question. Some examples of passages and Q&A are provided below.Think step by step, then write a line of the form 'Answer: $ANSWER' at the end of your response."
 
+
 def load_file_drop(fn, limit=0):
     data = []
     with open(fn, "r", encoding='utf-8') as f:
@@ -19,6 +20,7 @@ def load_file_drop(fn, limit=0):
                 break
     return data
 
+
 def get_fewshot_cot_prompt_drop(num_fewshot):
     assert 0 <= num_fewshot <= 8
     fewshot_cot_fn = os.path.join(drop_dir, "fewshot.txt")
@@ -31,6 +33,7 @@ def get_fewshot_cot_prompt_drop(num_fewshot):
     for text in lst[:num_fewshot]:
         fewshot_prompt += text + "\n\n"
     return fewshot_prompt
+
 
 def load_data_drop(args):
     task_config = args.tasks_config["drop"]

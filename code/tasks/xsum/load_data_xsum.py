@@ -1,7 +1,9 @@
 import os, json
 
+
 xsum_dir = os.path.join("data", "tasks", "xsum")
 xsum_instruction = "You will be asked to read a dialog and summary the dialog. Some examples of dialogs and summaries are provided below.Think step by step, then write a summary of the form 'Answer: $ANSWER' at the end of your response."
+
 
 def load_file_xsum(fn, limit=0):
     data = []
@@ -9,15 +11,14 @@ def load_file_xsum(fn, limit=0):
         
         for line in f:
             try:
-                # 尝试解析JSON
                 data.append(json.loads(line))
             except json.JSONDecodeError as e:
-                # 如果解析失败，打印错误信息并跳过当前行
                 print(f"Skipping line with JSONDecodeError: {e}")
-                continue  # 继续读取下一行
+                continue
             if limit and len(data) >= limit:
                 break
     return data
+
 
 def get_fewshot_cot_prompt_xsum(num_fewshot):
     assert 0 <= num_fewshot <= 8
@@ -31,6 +32,7 @@ def get_fewshot_cot_prompt_xsum(num_fewshot):
     for text in lst[:num_fewshot]:
         fewshot_prompt += text + "\n\n"
     return fewshot_prompt
+
 
 def load_data_xsum(args):
     task_config = args.tasks_config["xsum"]

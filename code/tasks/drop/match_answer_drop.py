@@ -3,12 +3,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import re
 from scipy.optimize import linear_sum_assignment
 import string, numpy as np
-
 EXCLUDE = set(string.punctuation)
-"""
-exact_match: Match answer after 'The answer is #### '
-flexible_match: Match every number in the response, if any number equals to the answer, the answer is correct.
-"""
 
 
 drop_data_pattern = [
@@ -17,6 +12,8 @@ drop_data_pattern = [
         '\s*(\d+\.?\d*)\s*',
         '\s*([A-Za-z]+)\s*',
     ]
+
+
 def normalize(s: str) -> str:
     """Lower text and remove punctuation, articles and extra whitespace."""
     s = s.lower()
@@ -26,9 +23,9 @@ def normalize(s: str) -> str:
     s = " ".join(s.split())
     return s
 
+
 def match_answer_drop(infer_result, round_idx, args):
     exact_match_cnt = 0
-    flexible_match_cnt = 0 
     result = {}
     for item in infer_result["drop"]:
         answer = []
@@ -56,7 +53,6 @@ def match_answer_drop(infer_result, round_idx, args):
                         break
                 if flag == 1:
                     break
-
     result["drop"] = {
         "exact_match": exact_match_cnt / len(infer_result["drop"]),
     }
