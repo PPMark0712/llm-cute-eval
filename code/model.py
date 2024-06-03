@@ -12,9 +12,12 @@ def init_vllm_model(args):
     else:
         sampling_params = SamplingParams(
             max_tokens=512,  # 根据需要生成的内容长度来调整
-            temperature=0,
+            temperature=0.9,
             top_p=0.8,
             top_k=50,
-            stop=["Question:", "</s>", "<|eot_id|>", "Human:", "Q:", "Text:", "<|end_of_text|>", "<|start_header_id|>", "<|end_header_id|>"]
+            frequency_penalty =0.5,  # 适度惩罚重复的词汇
+            presence_penalty=0.5,  # 适度惩罚已经出现的词汇
+            repetition_penalty=1,  # 适度鼓励新词汇的使用
+            stop=["<|eot_id|>", "<|end_of_text|>", "Question:"]
         )
     return vllm_model, sampling_params

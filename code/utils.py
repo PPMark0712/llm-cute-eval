@@ -1,7 +1,7 @@
 TASK_LIST = [
     "arc",
     "commonsenseqa",
-    "drop"
+    "drop",
     "gsm8k",
     "hellaswag",
     "humaneval",

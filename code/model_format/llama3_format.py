@@ -39,13 +39,13 @@ class ChatFormat:
         for message in dialog:
             tokens.extend(self.add_message(message))
         # Add the start of an assistant message for the model to complete.
-        tokens.extend(self.add_header({"role": "assistant", "content": "A: "}))
+        tokens.extend(self.add_header({"role": "assistant", "content": ""}))
         return "".join(tokens)  # Return a single string concatenated from the list of tokens.
 
 
 def format_prompt_llama3(query, history):
     format = ChatFormat()
-    if len(history) > 0:
+    if len(history) == 0:
         dialog = [
             {
                 "role": "user",
@@ -59,28 +59,28 @@ def format_prompt_llama3(query, history):
                 dialog.extend([
                     {
                         "role": "user",
-                        "content": f"Q: {old_query}",
+                        "content": f"{old_query}",
                     },
                     {
                         "role": "assistant",
-                        "content": f"A: {response}",
+                        "content": f"{response}",
                     },
                 ])
             else:
                 dialog.extend([
                     {
                         "role": "user",
-                        "content": f"Q: {old_query}",
+                        "content": f"{old_query}",
                     },
                     {
                         "role": "assistant",
-                        "content": f"A: {response}",
+                        "content": f"{response}",
                     },
                 ])
         dialog.extend([
             {
                 "role": "user",
-                "content": f"Q: {query}",
+                "content": f"{query}",
             },
         ])
     question = format.add_dialog_prompt(dialog)

@@ -40,15 +40,16 @@ def match_answer_drop(infer_result, round_idx, args):
             exact_answer = re.findall(pa, norm_answer_item)
             if exact_answer:
                 break  
-        item[f"exact_match{round_idx}"] = False
+        item[f"judge{round_idx}"] = False
         if len(exact_answer) > 0:
             model_answer = exact_answer[0].split(' ')
             flag = 0
             for ans1 in model_answer:
                 for ans2 in answer:
                     if ans1 == ans2:
-                        item[f"exact_match{round_idx}"] = True
+                        item[f"exact_match{round_idx}"] = ans2
                         exact_match_cnt += 1
+                        item[f"judge{round_idx}"] = True
                         flag = 1
                         break
                 if flag == 1:
