@@ -1,6 +1,8 @@
 # Byte-compiled / optimized / DLL files
 data/
 output/
+config_debug.json
+run_for_mergemodel.sh
 *.zip
 __pycache__/
 *.py[cod]

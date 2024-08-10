@@ -34,8 +34,11 @@ def initialize(args):
         except FileNotFoundError:
             pass
     
-    t = datetime.datetime.now()
-    args.save_path = os.path.join(args.output_path, f"{t.month}-{t.day}_{t.hour:02d}:{t.minute:02d}_{args.save_name}")
+    if args.no_timestamp:
+        args.save_path = os.path.join(args.output_path, args.save_name)
+    else:
+        t = datetime.datetime.now()
+        args.save_path = os.path.join(args.output_path, f"{t.month}-{t.day}_{t.hour:02d}:{t.minute:02d}_{args.save_name}")
     
     os.makedirs(os.path.join(args.save_path, args.temp_file_path), exist_ok=True)
 
@@ -45,6 +48,9 @@ def initialize(args):
         run_config = {**vars(args)}
         json.dump(run_config, f, indent=4)
 
+
+def finallize(args):
+    os.system(f"rm -r {os.path.join(args.save_path, args.temp_file_path)}")
 
 def get_tasks_data(args):
     """
@@ -67,7 +73,8 @@ def run_infer(tasks_data:dict, model:LLM, sampling_params:SamplingParams, args):
     """
     infer_result = dict(tasks_data)
     for round_idx in range(1, args.rounds + 1):
-        print(f"running infer round {round_idx}")
+        if args.rounds > 1:
+            print(f"running infer round {round_idx}")
         # get all prompts
         prompts = []
         for task in tasks_data:
@@ -169,7 +176,6 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", type=str)
     parser.add_argument("--model_type", type=str, default="default")
-    parser.add_argument("--data_path", type=str, default="data")
     parser.add_argument("--config_path", type=str, default="config.json")
     parser.add_argument("--tasks", type=str, nargs="+")
     parser.add_argument("--output_path", type=str, default="output")
@@ -179,6 +185,7 @@ def get_args():
     parser.add_argument("--sampling_params", type=str, default=None)
     parser.add_argument("--refine_prompt", type=str, default="Please further think about and give me a more precise and professional answer.\n")
     parser.add_argument("--temp_file_path", type=str, default="temp_file")
+    parser.add_argument("--no_timestamp", action="store_true")
     args = parser.parse_args()
     return args
 
@@ -191,6 +198,7 @@ def main():
     inference_result = run_infer(tasks_data, model, sampling_params, args)
     score = run_eval(inference_result, args)
     save_result(inference_result, score, args)
+    finallize(args)
     
 
 if __name__ == "__main__":

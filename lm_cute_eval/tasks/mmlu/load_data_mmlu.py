@@ -1,5 +1,4 @@
 import os, csv, json
-from ...utils import TASKS_SUBJECTS
 
 mmlu_dir = os.path.join("data", "tasks", "mmlu")
 
@@ -60,8 +59,6 @@ def load_data_mmlu(args):
     with open(fewshot_fn, "r") as f:
         fewshot_data = json.load(f)
     task_data = {}
-    if "subjects" not in task_config:
-        task_config["subjects"] = TASKS_SUBJECTS["mmlu"]
     subjects = task_config["subjects"]
     for subject in subjects:
         fn = os.path.join(mmlu_dir, "test", f"{subject}_test.csv")

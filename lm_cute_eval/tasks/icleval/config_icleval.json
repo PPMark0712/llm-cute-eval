@@ -1,0 +1,16 @@
+{
+    "subjects": [
+        "classifier_duplication",
+        "classifier_format",
+        "classifier_order",
+        "copy_dict_search_number",
+        "generate_count_or_navigation",
+        "generate_duplication",
+        "generate_format_conversion",
+        "generate_list_number",
+        "generate_order",
+        "generate_output_format",
+        "generate_relation_analysis"
+    ],
+    "limit": null
+}

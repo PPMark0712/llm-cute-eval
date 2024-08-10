@@ -21,6 +21,9 @@
     "humaneval": {
         "limit": null
     },
+    "icleval": {
+        "limit": null
+    },
     "mmlu": {
         "num_fewshot": 5
     },

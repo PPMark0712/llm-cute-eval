@@ -2,11 +2,11 @@
     "arc": {
         "arc_e": {
             "num_fewshot": 0,
-            "limit": 5
+            "limit": 1
         },
         "arc_c": {
             "num_fewshot": 25,
-            "limit": 5
+            "limit": 1
         }
     },
     "commonsenseqa": {
@@ -15,14 +15,17 @@
     },
     "gsm8k": {
         "num_fewshot": 8,
-        "limit": 1
+        "limit": 1  
     },
     "hellaswag": {
         "num_fewshot": 4,
         "limit": 1
     },
     "humaneval": {
-        "limit": 5
+        "limit": 1
+    },
+    "icleval": {
+        "limit": 1
     },
     "mmlu": {
         "num_fewshot": 5,

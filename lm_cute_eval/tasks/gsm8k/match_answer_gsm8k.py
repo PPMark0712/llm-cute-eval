@@ -5,10 +5,9 @@ exact_match: Match answer after 'The answer is #### '
 flexible_match: Match every number in the response, if any number equals to the answer, the answer is correct.
 """
 
-
-number_pattern = r'(-?\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)'
+number_pattern = r'(-?\d+(?:,\d{3})*(?:\.\d+)?)'
 gsm8k_data_pattern = "#### " + number_pattern
-exact_pattern = r"The\s+answer\s+is\s+#+\s+" + number_pattern
+exact_pattern = r'The answer is[:\s#\$]*\s*' + number_pattern
 flexible_pattern = number_pattern
 
 def str_to_float(text: str):

@@ -1,0 +1,6 @@
+numpy==1.26.3
+tokenizers==0.15.0
+torch==2.1.2
+tqdm==4.66.1
+transformers==4.39.3
+vllm==0.3.2

@@ -14,7 +14,7 @@ def get_fewshot_prompt():
     return fewshot_prompt
 
 def format_humaneval_prompt(question:str):
-    prompt = "Question:\n" + "```python\n" + question.strip() + "```\nAnswer:\n"
+    prompt = "Question:\n" + "```python\n" + question.strip() + "```\n\nAnswer:\n"
     return prompt
 
 

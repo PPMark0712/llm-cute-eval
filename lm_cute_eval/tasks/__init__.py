@@ -3,6 +3,7 @@ from .commonsenseqa.load_data_commonsenseqa import load_data_commonsenseqa
 from .gsm8k.load_data_gsm8k import load_data_gsm8k
 from .hellaswag.load_data_hellaswag import load_data_hellaswag
 from .humaneval.load_data_humaneval import load_data_humaneval
+from .icleval.load_data_icleval import load_data_icleval
 from .mmlu.load_data_mmlu import load_data_mmlu
 from .winogrande.load_data_winogrande import load_data_winogrande
 
@@ -12,6 +13,7 @@ LOAD_TASK_DATA = {
     "gsm8k": load_data_gsm8k,
     "hellaswag": load_data_hellaswag,
     "humaneval": load_data_humaneval,
+    "icleval": load_data_icleval,
     "mmlu": load_data_mmlu,
     "winogrande": load_data_winogrande,
 }
@@ -21,6 +23,7 @@ from .commonsenseqa.match_answer_commonsenseqa import match_answer_commonsenseqa
 from .gsm8k.match_answer_gsm8k import match_answer_gsm8k
 from .hellaswag.match_answer_hellaswag import match_answer_hellaswag
 from .humaneval.match_answer_humaneval import match_answer_humaneval
+from .icleval.match_answer_icleval import match_answer_icleval
 from .mmlu.match_answer_mmlu import match_answer_mmlu
 from .winogrande.match_answer_winogrande import match_answer_winogrande
 
@@ -30,6 +33,7 @@ MATCH_TASK_ANSWER = {
     "gsm8k": match_answer_gsm8k,
     "hellaswag": match_answer_hellaswag,
     "humaneval": match_answer_humaneval,
+    "icleval": match_answer_icleval,
     "mmlu": match_answer_mmlu,
     "winogrande": match_answer_winogrande,
 }

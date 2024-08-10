@@ -16,6 +16,8 @@ def match_answer_humaneval(infer_result:dict, round_idx:int, args):
                 completion = function_prefix + function_text.split(function_prefix)[1]
             except:
                 completion = "failed to extract answer"
+
+            item[f"extracted_answer_round{round_idx}"] = completion
             print(json.dumps({
                 "task_id": item["task_id"],
                 "completion": completion,
