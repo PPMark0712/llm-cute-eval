@@ -16,10 +16,14 @@ def initialize(args):
     # init args
     if args.sampling_params:
         args.sampling_params = json.loads(args.sampling_params)
-    
+
     # init task config
     if "all" in args.tasks:
         args.tasks = TASK_LIST
+    
+    for task in args.tasks:
+        assert task in args.tasks
+
     with open(args.config_path, "r") as f:
         args.tasks_config = json.load(f)
     for task in args.tasks:
