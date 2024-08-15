@@ -1,14 +1,4 @@
 {
-    "arc": {
-        "arc_e": {
-            "num_fewshot": 0,
-            "limit": null
-        },
-        "arc_c": {
-            "num_fewshot": 25,
-            "limit": null
-        }
-    },
     "commonsenseqa": {
         "num_fewshot": 7
     },

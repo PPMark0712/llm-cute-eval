@@ -11,9 +11,8 @@ for model_name in "${!models[@]}"; do
         --model_path "$model_path" \
         --model_type default \
         --sampling_params '{"max_tokens": 40, "stop": ["Input"]}' \
-        --tasks icleval \
+        --tasks all \
         --save_name "$model_name" \
         --save_infer_results \
-        --config_path config.json \
-        --output_path output
+        
 done

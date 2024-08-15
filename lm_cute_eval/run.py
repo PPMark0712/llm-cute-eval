@@ -23,18 +23,33 @@ def initialize(args):
     
     for task in args.tasks:
         assert task in args.tasks
-
-    with open(args.config_path, "r") as f:
-        args.tasks_config = json.load(f)
+    
+    if args.config_path:
+        with open(args.config_path, "r") as f:
+            args.tasks_config = json.load(f)
+    else:
+        args.tasks_config = {}
+    
+    def merge_dicts(d1, d2):
+        """递归地将将d2合并进d1"""
+        for key, value in d2.items():
+            if key in d1:
+                if isinstance(d1[key], dict) and isinstance(value, dict):
+                    merge_dicts(d1[key], value)  # 递归合并子字典
+                else:
+                    continue  # 如果d1已有此键值，跳过，不做更改
+            else:
+                d1[key] = value  # 如果d1没有此键值，添加
+        return d1
+    
     for task in args.tasks:
         try:
-            with open(f"code/tasks/{task}/config_{task}.json", "r") as f:
+            default_config_fn = os.path.join("lm_cute_eval", "tasks", task, f"config_{task}.json")
+            with open(default_config_fn, "r") as f:
                 default_task_config =  json.load(f)
             if task not in args.tasks_config:
                 args.tasks_config[task] = default_task_config
-            for k, v in default_task_config.items():
-                if k not in args.tasks_config[task]:
-                    args.tasks_config[task][k] = v
+            args.tasks_config[task] = merge_dicts(args.tasks_config[task], default_task_config)
         except FileNotFoundError:
             pass
     
@@ -180,7 +195,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", type=str)
     parser.add_argument("--model_type", type=str, default="default")
-    parser.add_argument("--config_path", type=str, default="config.json")
+    parser.add_argument("--config_path", type=str, default=None)
     parser.add_argument("--tasks", type=str, nargs="+")
     parser.add_argument("--output_path", type=str, default="output")
     parser.add_argument("--rounds", type=int, default=1)
