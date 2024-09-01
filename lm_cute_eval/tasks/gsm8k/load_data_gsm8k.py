@@ -1,7 +1,5 @@
 import os, json
 
-gsm8k_dir = os.path.join("data", "tasks", "gsm8k")
-gsm8k_instruction = "Solve the following math questions. Please think step by step and finally give the answer.\n\n"
 
 def load_file_gsm8k(fn, limit=0):
     data = []
@@ -23,7 +21,7 @@ def load_file_gsm8k(fn, limit=0):
 #     return fewshot_prompt
 
 
-def get_fewshot_cot_prompt_gsm8k(num_fewshot):
+def get_fewshot_cot_prompt_gsm8k(gsm8k_dir, num_fewshot):
     assert 0 <= num_fewshot <= 8
     fewshot_cot_fn = os.path.join(gsm8k_dir, "fewshot_cot.txt")
     file_str = ""
@@ -39,10 +37,13 @@ def get_fewshot_cot_prompt_gsm8k(num_fewshot):
 
 
 def load_data_gsm8k(args):
+    gsm8k_dir = os.path.join("data", "tasks", "gsm8k")
+    gsm8k_instruction = "Solve the following math questions. Please think step by step and finally give the answer.\n\n"
+
     task_config = args.tasks_config["gsm8k"]
     test_data = load_file_gsm8k(os.path.join(gsm8k_dir, "test.jsonl"), task_config["limit"])
     task_data = {"gsm8k": []}
-    fewshot_prompt = get_fewshot_cot_prompt_gsm8k(task_config["num_fewshot"])
+    fewshot_prompt = get_fewshot_cot_prompt_gsm8k(gsm8k_dir, task_config["num_fewshot"])
     for item in test_data:
         prompt = "Question: " + item["question"] + "\nAnswer: Let's think step by step\n"
         task_data["gsm8k"].append({

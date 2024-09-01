@@ -1,10 +1,8 @@
 import os, json
 
-winogrande_dir = os.path.join("data", "tasks", "winogrande")
-winogrande_instruction = "Below are some cloze questions on general knowledge. Choose the most appropriate option from A or B to fill in the blank (_) in the sentence.\n\n\n"
-question_template = "Question: {question}\nOptions:\n(A) {A}\n(B) {B}\nAnswer:"
 
 def format_query_winogrande(data, has_answer):
+    question_template = "Question: {question}\nOptions:\n(A) {A}\n(B) {B}\nAnswer:"
     prompt = question_template.format(
         question=data["Q"],
         A=data["A"],
@@ -32,7 +30,7 @@ def load_file_winogrande(fn, limit=None):
     return data
 
 
-def get_fewshot_prompt_winogrande(num_fewshot):
+def get_fewshot_prompt_winogrande(winogrande_dir, num_fewshot):
     fewshot_prompt = ""
     fewshot_fn = os.path.join(winogrande_dir, "train_xs.jsonl")
     fewshot_data = load_file_winogrande(fewshot_fn, num_fewshot)
@@ -41,7 +39,7 @@ def get_fewshot_prompt_winogrande(num_fewshot):
     return fewshot_prompt
 
 
-def get_fewshot_cot_prompt_winogrande():
+def get_fewshot_cot_prompt_winogrande(winogrande_dir):
     fewshot_prompt = ""
     fewshot_fn = os.path.join(winogrande_dir, "fewshot_cot.txt")
     with open(fewshot_fn, "r") as f:
@@ -50,12 +48,15 @@ def get_fewshot_cot_prompt_winogrande():
     return fewshot_prompt
 
 def load_data_winogrande(args):
+    winogrande_dir = os.path.join(args.data_path, "tasks", "winogrande")
+    winogrande_instruction = "Below are some cloze questions on general knowledge. Choose the most appropriate option from A or B to fill in the blank (_) in the sentence.\n\n\n"
+
     task_config = args.tasks_config["winogrande"]
     task_data = {}
     test_fn = os.path.join(winogrande_dir, "dev.jsonl")
     test_data = load_file_winogrande(test_fn, task_config["limit"])
-    # fewshot_prompt = get_fewshot_prompt_winogrande(task_config["num_fewshot"])
-    fewshot_cot_prompt = get_fewshot_cot_prompt_winogrande()
+    # fewshot_prompt = get_fewshot_prompt_winogrande(winogrande_dir, task_config["num_fewshot"])
+    fewshot_cot_prompt = get_fewshot_cot_prompt_winogrande(winogrande_dir)
     data = []
     for item in test_data:
         prompt = format_query_winogrande(item, False) + " Let's think step by step.\n"

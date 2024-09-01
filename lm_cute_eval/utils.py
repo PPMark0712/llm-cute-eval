@@ -6,6 +6,7 @@ TASK_LIST = [
     "humaneval",
     "icleval",
     "mmlu",
+    "rgb",
     "winogrande",
 ]
 

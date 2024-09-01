@@ -1,10 +1,7 @@
 import os, json
 
-arc_dir = os.path.join("data", "tasks", "arc")
-arc_instruction = "The following are multiple choice questions about reasoning. Choose A, B, C, or D to answer the questions.\n\n\n"
-question_template = "{question}\n{A}{B}{C}{D}\n"
-
 def format_arc_query(data, has_answer):
+    question_template = "{question}\n{A}{B}{C}{D}\n"
     prompt = "Question: " + question_template.format(
         question=data["Q"],
         A=data["A"],
@@ -44,6 +41,9 @@ def load_fewshot_data(dev_data, begin_idx, num_fewshot):
 
 
 def load_data_arc(args):
+    arc_dir = os.path.join(args.data_path, "tasks", "arc")
+    arc_instruction = "The following are multiple choice questions about reasoning. Choose A, B, C, or D to answer the questions.\n\n\n"
+
     task_config = args.tasks_config["arc"]
     task_data = {}
     dev_data = {

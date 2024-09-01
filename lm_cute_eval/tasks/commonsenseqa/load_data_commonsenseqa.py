@@ -1,10 +1,8 @@
 import os, json
 
-cqa_dir = os.path.join("data", "tasks", "commonsenseqa")
-cqa_instruction = "The following are multiple choice questions about commonsense. Choose A, B, C, D or E to answer the questions.\n\n\n"
-question_template = "{question}\n{A}{B}{C}{D}{E}\n"
 
 def format_cqa_query(data, has_answer):
+    question_template = "{question}\n{A}{B}{C}{D}{E}\n"
     prompt = "Question: " + question_template.format(
         question=data["Q"],
         A=data["A"],
@@ -42,6 +40,8 @@ def get_fewshot_prompt_commonsenseqa(train_data, begin_idx, num_fewshot):
 
 
 def load_data_commonsenseqa(args):
+    cqa_dir = os.path.join(args.data_path, "tasks", "commonsenseqa")
+    cqa_instruction = "The following are multiple choice questions about commonsense. Choose A, B, C, D or E to answer the questions.\n\n\n"
     task_config = args.tasks_config["commonsenseqa"]
     task_data = {}
     test_fn = os.path.join(cqa_dir, "dev_rand_split.jsonl")

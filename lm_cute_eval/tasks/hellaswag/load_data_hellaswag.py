@@ -1,10 +1,9 @@
 import os, json
 
-hellaswag_dir = os.path.join("data", "tasks", "hellaswag")
-hellaswag_instruction = "Here are some multiple-choice questions about continuation writing. Each question contains a paragraph and four options for possible continuations. Choose the most appropriate continuation from options A, B, C, and D.\n\n\n"
-question_template = "Question: {question}\nOptions:\n(A) {A}\n(B) {B}\n(C) {C}\n(D) {D}\nAnswer: The most appropriate continuation is "
 
 def format_query_hellaswag(data, has_answer):
+    question_template = "Question: {question}\nOptions:\n(A) {A}\n(B) {B}\n(C) {C}\n(D) {D}\nAnswer: The most appropriate continuation is "
+
     prompt = question_template.format(
         question=data["Q"],
         A=data["A"],
@@ -33,7 +32,7 @@ def load_file_hellaswag(fn, limit=None):
     return data
 
 
-def get_fewshot_prompt_hellaswag(num_fewshot):
+def get_fewshot_prompt_hellaswag(hellaswag_dir, num_fewshot):
     assert 0 <= num_fewshot <= 25
     fewshot_prompt = ""
     fewshot_fn = os.path.join(hellaswag_dir, "hellaswag_train_sampled25.jsonl")
@@ -45,11 +44,14 @@ def get_fewshot_prompt_hellaswag(num_fewshot):
 
 
 def load_data_hellaswag(args):
+    hellaswag_dir = os.path.join(args.data_path, "tasks", "hellaswag")
+    hellaswag_instruction = "Here are some multiple-choice questions about continuation writing. Each question contains a paragraph and four options for possible continuations. Choose the most appropriate continuation from options A, B, C, and D.\n\n\n"
+
     task_config = args.tasks_config["hellaswag"]
     task_data = {}
     test_fn = os.path.join(hellaswag_dir, "hellaswag.jsonl")
     test_data = load_file_hellaswag(test_fn, task_config["limit"])
-    fewshot_prompt = get_fewshot_prompt_hellaswag(task_config["num_fewshot"])
+    fewshot_prompt = get_fewshot_prompt_hellaswag(hellaswag_dir, task_config["num_fewshot"])
     data = []
     for item in test_data:
         prompt = format_query_hellaswag(item, False)

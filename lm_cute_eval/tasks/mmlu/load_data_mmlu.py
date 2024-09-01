@@ -1,8 +1,9 @@
 import os, csv, json
 
-mmlu_dir = os.path.join("data", "tasks", "mmlu")
 
-question_template = """
+
+def format_query_mmlu(data):
+    question_template = """
 Human:
 Q: {Q}
 Which one of the four choices is correct, (A), (B), (C) or (D)?
@@ -14,9 +15,7 @@ Choices:
 
 Assistant:
 Let's think step by step. 
-A:"""
-
-def format_query_mmlu(data):
+A: """
     prompt = question_template.format(
         Q=data["Q"],
         A=data["A"],
@@ -54,6 +53,7 @@ def get_inst_and_fewshot_cot(fewshot_data, subject):
 
 
 def load_data_mmlu(args):
+    mmlu_dir = os.path.join(args.data_path, "tasks", "mmlu")
     task_config = args.tasks_config["mmlu"]
     fewshot_fn = os.path.join(mmlu_dir, "fewshot-cot", "mmlu-cot-claude-multiple.json")
     with open(fewshot_fn, "r") as f:

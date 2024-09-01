@@ -115,7 +115,7 @@ def run_infer(tasks_data:dict, model:LLM, sampling_params:SamplingParams, args):
         outputs = model.generate(prompts, sampling_params)
         generated_texts = [output.outputs[0].text for output in outputs]
 
-        if args.save_infer_results:
+        if args.save_infer_texts:
             with open(f"{args.save_path}/infer_round{round_idx}.txt", "w") as f:
                 for x, y in zip(prompts, generated_texts):
                     print("="*20, file=f)
@@ -196,11 +196,14 @@ def get_args():
     parser.add_argument("--model_path", type=str)
     parser.add_argument("--model_type", type=str, default="default")
     parser.add_argument("--config_path", type=str, default=None)
+    parser.add_argument("--data_path", type=str, default="data")
     parser.add_argument("--tasks", type=str, nargs="+")
     parser.add_argument("--output_path", type=str, default="output")
     parser.add_argument("--rounds", type=int, default=1)
+    parser.add_argument("--seed", type=int, default=123456)
     parser.add_argument("--save_name", type=str)
     parser.add_argument("--save_infer_results", action="store_true")
+    parser.add_argument("--save_infer_texts", action="store_true")
     parser.add_argument("--sampling_params", type=str, default=None)
     parser.add_argument("--refine_prompt", type=str, default="Please further think about and give me a more precise and professional answer.\n")
     parser.add_argument("--temp_file_path", type=str, default="temp_file")

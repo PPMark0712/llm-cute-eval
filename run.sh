@@ -2,7 +2,10 @@ export CUDA_VISIBLE_DEVICES=7
 export TOKENIZERS_PARALLELISM=false
 
 declare -A models=(
-    ["Qwen-7B"]="/data1/yyz/downloads/models/Qwen/Qwen2-7B"
+    # ["Llama-2-7b-hf"]="/data1/yyz/downloads/models/NousResearch/Llama-2-7b-hf"
+    # ["Xwin-Math-7B-V1.1"]="/data1/yyz/downloads/models/Xwin-LM/Xwin-Math-7B-V1.1"
+    ["Qwen1.5-14B"]="/data1/yyz/downloads/models/Qwen/Qwen1.5-14B"
+    # ["Qwen1.5-14B-FT"]="/data1/yyz/downloads/models/Qwen/Qwen1.5-14B-FT"
 )
 
 for model_name in "${!models[@]}"; do
@@ -10,9 +13,11 @@ for model_name in "${!models[@]}"; do
     python main.py \
         --model_path "$model_path" \
         --model_type default \
-        --sampling_params '{"max_tokens": 40, "stop": ["Input"]}' \
-        --tasks all \
+        --sampling_params '{"max_tokens": 1000, "stop": ["Input"]}' \
+        --tasks rgb all \
         --save_name "$model_name" \
         --save_infer_results \
-        
+        --save_infer_texts \
+        --config_path config_debug.json \
+        --output_path output/debug
 done

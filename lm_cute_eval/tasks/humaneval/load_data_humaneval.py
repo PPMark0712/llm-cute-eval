@@ -1,11 +1,8 @@
 import os
-
 from .human_eval.data import read_problems
 
-humaneval_dir = os.path.join("data", "tasks", "humaneval")
-humaneval_instruction = "Please complete the following python functions and output the entire function within a python code block, without any explainations.\n\n\n"
 
-def get_fewshot_prompt():
+def get_fewshot_prompt(humaneval_dir):
     fewshot_fn = os.path.join(humaneval_dir, "fewshot_prompt.txt")
     fewshot_prompt = ""
     with open(fewshot_fn, "r") as f:
@@ -19,10 +16,12 @@ def format_humaneval_prompt(question:str):
 
 
 def load_data_humaneval(args):
+    humaneval_instruction = "Please complete the following python functions and output the entire function within a python code block, without any explainations.\n\n\n"
+    humaneval_dir = os.path.join(args.data_path, "tasks", "humaneval")
     task_config = args.tasks_config["humaneval"]
-    data = read_problems()
+    data = read_problems(os.path.join(humaneval_dir, "HumanEval.jsonl.gz"))
     task_data = {"humaneval": []}
-    fewshot_prompt = get_fewshot_prompt()
+    fewshot_prompt = get_fewshot_prompt(humaneval_dir)
     for humaneval_id, item in data.items():
         task_data["humaneval"].append({
             **item, 
