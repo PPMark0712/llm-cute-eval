@@ -17,7 +17,7 @@ for model_name in "${!models[@]}"; do
         --model_path "$model_path" \
         --model_type hf \
         --format_type default \
-        --tasks rgb icleval \
+        --tasks drop \
         --save_name "$model_name" \
         --save_infer_texts \
         --config_path config_debug.json \

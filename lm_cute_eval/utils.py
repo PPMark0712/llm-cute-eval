@@ -1,6 +1,7 @@
 TASK_LIST = [
     "arc",
     "commonsenseqa",
+    "drop",
     "gsm8k",
     "hellaswag",
     "humaneval",
@@ -8,6 +9,7 @@ TASK_LIST = [
     "mmlu",
     "rgb",
     "winogrande",
+    "xsum",
 ]
 
 from .tasks import LOAD_TASK_DATA, MATCH_TASK_ANSWER
