@@ -125,6 +125,10 @@ def run_eval(infer_results, args):
     for round_idx in range(1, args.rounds + 1):
         result[f"round{round_idx}"] = {}
         print(args.tasks)
+        if "xsum" in args.tasks:
+            torch.cuda.empty_cache()
+            model = BGEM3FlagModel('/data1/dcy/downloads/model/BAAI/bge-m3', use_fp16=True)
+            args.model = model
         for task in args.tasks:
             print(task)
             result[f"round{round_idx}"][task] = MATCH_TASK_ANSWER[task](infer_results[task], round_idx, args)
@@ -219,7 +223,7 @@ def load_inference_results(infer_result_path: str):
 
 
 def main():
-    load_path = "/data1/dcy/projects/evaluate/lm-cute-eval/output/5-30_10:48_llama3_refine_gen_all"
+    load_path = "/data1/dcy/projects/evaluate/lm-cute-eval/output/7-25_13:09_Llama-3_dpo_1"
     # load_path = "/data1/dcy/projects/evaluate/lm-cute-eval/output/5-25_02:21_llama3_gen"
     # load_path = "/data1/dcy/projects/evaluate/lm-cute-eval/output/5-25_02:38_llama3_gen"
     # load_path = "/data1/dcy/projects/evaluate/lm-cute-eval/output/5-25_02:39_llama3_gen"

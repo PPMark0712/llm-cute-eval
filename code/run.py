@@ -78,6 +78,8 @@ def run_infer(tasks_data:dict, model:LLM, sampling_params:SamplingParams, args):
                     else:                    
                         history = []
                         history.append((item[f"prompt_round{1}"], item[f"infer_round{round_idx-1}"]))
+                        # for i in range(round_idx - 1):
+                        #     history.append((item[f"prompt_round{i+1}"], item[f"infer_round{i+1}"]))
                         query = item[f"prompt_round{round_idx}"]    
                         prompt = MODEL_FORMAT[args.model_type](query, history)
                     prompts.append(prompt)
@@ -110,7 +112,7 @@ def run_infer(tasks_data:dict, model:LLM, sampling_params:SamplingParams, args):
                     item[f"prompt_round{round_idx + 1}"] = args.refine_prompt
     
     return infer_result
-from FlagEmbedding import BGEM3FlagModel
+# from FlagEmbedding import BGEM3FlagModel
 
 def run_eval(infer_results, args):
     result = defaultdict(dict)
@@ -118,9 +120,11 @@ def run_eval(infer_results, args):
         result[f"round{round_idx}"] = {}
         if "xsum" in args.tasks:
             torch.cuda.empty_cache()
-            model = BGEM3FlagModel('/data1/dcy/downloads/model/BAAI/bge-m3', use_fp16=True)
-            args.model = model
+            # model = BGEM3FlagModel('/data1/dcy/downloads/model/BAAI/bge-m3', use_fp16=True)
+            # args.model = model
         for task in args.tasks:
+            if task == "xsum":
+                continue
             result[f"round{round_idx}"][task] = MATCH_TASK_ANSWER[task](infer_results[task], round_idx, args)
     return result
 

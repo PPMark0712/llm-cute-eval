@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=6,7
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 export TOKENIZERS_PARALLELISM=false
 
 # model_path=/data1/dcy/projects/fine-tune/fine-tune-yyz/train/output/5-16_11:21_llama2_13b/ckpt/llama2_13b_8000
@@ -25,23 +25,12 @@ model_path=/data1/dcy/projects/fine-tune/fine-tune-yyz/train/output/6-9_19:39_ll
 model_path=/data1/dcy/projects/fine-tune/LLaMA-Factory-main/saves/LLaMA3-8B-Chat/full/train_2024-07-20-23-25-59/checkpoint-1544
 model_path=/data1/dcy/projects/fine-tune/LLaMA-Factory-main/saves/Qwen2-7B-Chat/full/train_2024-07-24-15-03-40/checkpoint-525
 model_path=/data1/dcy/projects/fine-tune/LLaMA-Factory-main/saves/LLaMA3-8B-Chat/full/train_2024-07-20-23-25-59
-model_path=/mnt/data122/hhx/ckp/qwen2-72b-instruct
-model_path=/mnt/data122/hhx/ckp/qwen2-7b-instruct
-model_path=/data2/dcy/downloads/model/Qwen/Qwen-7B-Chat
-model_path=/data2/dcy/downloads/model/Qwen/Qwen1.5-7B-Chat
-model_path=/data2/dcy/downloads/model/Qwen/Qwen2-Math-7B-Instruct
-model_path=/data2/dcy/downloads/model/google/gemma-2b-it
-model_path=/data1/dcy/projects/fine-tune/fine-tune-yyz/train/output/8-29_00:57_llama3_all_sft/ckpt/llama3_all_sft_30000
-model_path=/data1/dcy/projects/fine-tune/fine-tune-yyz/train/output/8-29_23:05_qwen2_all_refine/ckpt/qwen2_all_refine_30000
-model_path=/data1/dcy/projects/fine-tune/fine-tune-yyz/train/output/8-30_14:57_qwen2_all_sft/ckpt/qwen2_all_sft_16000
-model_path=/data2/dcy/downloads/model/Qwen/Qwen2-7B-Instruct
-model_path=/data2/dcy/downloads/model/meta-llama/Meta-Llama-3-8B-Instruct
-# model_path=/data1/yyz/downloads/models/NousResearch/Llama-2-13b-hf
+model_path=/data1/dcy/projects/fine-tune/LLaMA-Factory-main/saves/Qwen2-7B-Chat/full/train_2024-07-24-15-03-40/checkpoint-525
 python main.py \
     --model_path $model_path \
-    --model_type llama3 \
+    --model_type qwen \
     --tasks all\
-    --save_name Meta-Llama-3-8B-Instruct \
-    --round 2 \
+    --save_name qwen-sft_0808 \
+    --round 4 \
     --save_infer_results \
     --config_path config_zero.json

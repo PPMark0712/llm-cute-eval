@@ -7,6 +7,7 @@ def match_answer_mmlu(infer_result:dict, round_idx, args):
     result = {}
     for subject in task_config["subjects"]:
         correct_cnt = 0
+        total_cnt = 0
         for item in infer_result[subject]:
             l = re.findall(mmlu_pattern, item[f"infer_round{round_idx}"])
             if len(l) > 0:
@@ -15,27 +16,18 @@ def match_answer_mmlu(infer_result:dict, round_idx, args):
                 model_answer = find_first_selection(item[f"infer_round{round_idx}"])
             item[f"extract_answer_round{round_idx}"] = model_answer
             item[f"judge{round_idx}"] = False
-            
-            problem_answer = f'{item["ans"]} {item[item["ans"]]}'
-            problem_answer_list = problem_answer.replace("(", " ").replace(")", " ").replace("\n", " ").strip().upper().split(" ")
-            if model_answer is None:
-                model_answer = item[f"infer_round{round_idx}"]
-                model_answer_list = model_answer.upper().split(" ")
-            else:
-                model_answer_list = [model_answer.upper()]
-            for problem_answer in problem_answer_list:
-                if problem_answer in model_answer_list:
-                    correct_cnt += 1
-                    item[f"judge{round_idx}"] = True
-                    break
+            if not item[f"extract_answer_round{round_idx}"]:
+                continue
+            total_cnt+=1
+            if model_answer == item["ans"]:
+                correct_cnt += 1
+                item[f"judge{round_idx}"] = True
                 
-                
-            
-        subject_result = correct_cnt / len(infer_result[subject])
+        subject_result = correct_cnt / total_cnt
         result[subject] = {
             "acc": subject_result,
             "correct_cnt": correct_cnt,
-            "tot_cnt": len(infer_result[subject])
+            "tot_cnt": total_cnt
         }
 
     result["mmlu"] = {
