@@ -24,11 +24,13 @@ def match_answer_gsm8k(infer_result, round_idx, args):
                
         # match answer after 'The answer is #### '
         exact_answer = re.findall(exact_pattern, item[f"infer_round{round_idx}"])
+        item[f"judge{round_idx}"] = False
         if len(exact_answer) > 0:
             model_answer = str_to_float(exact_answer[0])
             item[f"exact_match{round_idx}"] = exact_answer
             if abs(model_answer - answer) < 1e-6:
                 exact_match_cnt += 1
+                item[f"judge{round_idx}"] = True
         else:
             item[f"exact_match{round_idx}"] = None
         
@@ -42,7 +44,7 @@ def match_answer_gsm8k(infer_result, round_idx, args):
         item[f"flexible_match{round_idx}"] = flexible_answers
 
     result["gsm8k"] = {
-        "exact_match": exact_match_cnt / len(infer_result["gsm8k"]),
+        # "exact_match": exact_match_cnt / len(infer_result["gsm8k"]),
         "flexible_match": flexible_match_cnt / len(infer_result["gsm8k"])
     }
     return result

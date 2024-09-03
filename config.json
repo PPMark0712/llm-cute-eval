@@ -2,6 +2,9 @@
     "commonsenseqa": {
         "num_fewshot": 7
     },
+    "drop": {
+        "num_fewshot": 5
+    },
     "gsm8k": {
         "num_fewshot": 8
     },
@@ -21,6 +24,9 @@
         "limit": null
     },
     "winogrande": {
+        "num_fewshot": 5
+    },
+    "xsum":{
         "num_fewshot": 5
     }
 }

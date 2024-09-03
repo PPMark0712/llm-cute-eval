@@ -4,10 +4,15 @@ from typing import (
     TypedDict,
 )
 
+Role = Literal["user", "assistant"]
+
 
 class Message(TypedDict):
-    role: Literal["user", "assistant"]
+    role: Role
     content: str
+
+
+Dialog = Sequence[Message]
 
 
 class ChatFormat:
@@ -16,21 +21,20 @@ class ChatFormat:
 
     def add_header(self, message: Message):
         tokens = []
-        tokens.append("<|start_header_id|>")
-        tokens.extend(message["role"])
-        tokens.append("<|end_header_id|>")
-        tokens.extend("\n\n")
+        tokens.append("<start_of_turn>")
+        tokens.extend(message["content"].strip())
+        tokens.append("\n")
         return tokens
 
     def add_message(self, message: Message):
         tokens = self.add_header(message)
-        tokens.extend(message["content"].strip())
-        tokens.append("<|eot_id|>")
+        tokens.extend(message["role"].strip())
+        tokens.append("<end_of_turn>")
+        tokens.append("\n")
         return tokens
 
-    def add_dialog_prompt(self, dialog: Sequence[Message]):
+    def add_dialog_prompt(self, dialog: Dialog):
         tokens = []
-        tokens.append("<|begin_of_text|>")
         for message in dialog:
             tokens.extend(self.add_message(message))
         # Add the start of an assistant message for the model to complete.
@@ -38,7 +42,7 @@ class ChatFormat:
         return "".join(tokens)  # Return a single string concatenated from the list of tokens.
 
 
-def format_prompt_llama3(query, history):
+def format_prompt_gemma(query, history):
     format = ChatFormat()
     if len(history) == 0:
         dialog = [

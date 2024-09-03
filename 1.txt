@@ -1,0 +1,13 @@
+Namespace(model_path='/data1/yyz/downloads/models/NousResearch/Llama-2-13b-hf', model_type='default', data_path='data', config_path='config_dcy.json', tasks=['arc', 'commonsenseqa', 'drop', 'gsm8k', 'hellaswag', 'humaneval', 'mmlu', 'winogrande', 'xsum'], output_path='output', rounds=2, save_name='llama3_gen', save_infer_results=True, sampling_params=None, refine_prompt='Please further think about and give me a more precise and professional answer.\n', temp_file_path='temp_file', tasks_config={'arc': {'arc_e': {'num_fewshot': 0, 'limit': 400}, 'arc_c': {'num_fewshot': 25, 'limit': 400}, 'subjects': ['arc_e', 'arc_c']}, 'commonsenseqa': {'num_fewshot': 7, 'limit': 400}, 'drop': {'num_fewshot': 8, 'limit': 400}, 'gsm8k': {'num_fewshot': 8, 'limit': 400}, 'hellaswag': {'num_fewshot': 4, 'limit': 400}, 'humaneval': {'limit': None}, 'mmlu': {'num_fewshot': 5, 'limit': 40, 'subjects': ['abstract_algebra', 'anatomy', 'astronomy', 'business_ethics', 'clinical_knowledge', 'college_biology', 'college_chemistry', 'college_computer_science', 'college_mathematics', 'college_medicine', 'college_physics', 'computer_security', 'conceptual_physics', 'econometrics', 'electrical_engineering', 'elementary_mathematics', 'formal_logic', 'global_facts', 'high_school_biology', 'high_school_chemistry', 'high_school_computer_science', 'high_school_european_history', 'high_school_geography', 'high_school_government_and_politics', 'high_school_macroeconomics', 'high_school_mathematics', 'high_school_microeconomics', 'high_school_physics', 'high_school_psychology', 'high_school_statistics', 'high_school_us_history', 'high_school_world_history', 'human_aging', 'human_sexuality', 'international_law', 'jurisprudence', 'logical_fallacies', 'machine_learning', 'management', 'marketing', 'medical_genetics', 'miscellaneous', 'moral_disputes', 'moral_scenarios', 'nutrition', 'philosophy', 'prehistory', 'professional_accounting', 'professional_law', 'professional_medicine', 'professional_psychology', 'public_relations', 'security_studies', 'sociology', 'us_foreign_policy', 'virology', 'world_religions']}, 'winogrande': {'num_fewshot': 5, 'limit': 400}, 'xsum': {'num_fewshot': 8, 'limit': 400}}, save_path='output/5-25_02:39_llama3_gen')
+arc
+commonsenseqa
+drop
+gsm8k
+hellaswag
+humaneval
+Reading samples...
+Running test suites...
+Writing results to output/5-25_02:39_llama3_gen/temp_file/humaneval_sample_round1.jsonl_results.jsonl...
+mmlu
+winogrande
+xsum

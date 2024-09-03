@@ -3,75 +3,56 @@ import json
 import argparse
 import os
 from collections import defaultdict
+import torch
 from tqdm import tqdm
+from vllm import LLM, SamplingParams
 import os
+import json
+from argparse import Namespace
+from FlagEmbedding import BGEM3FlagModel
+from .model import init_vllm_model
+from .utils import TASK_LIST, MODEL_FORMAT, LOAD_TASK_DATA, MATCH_TASK_ANSWER,TASKS_SUBJECTS
 
-from .model import initialize_model
-from .utils import TASK_LIST, MODEL_FORMAT, LOAD_TASK_DATA, MATCH_TASK_ANSWER
 
 
-def initialize(args):
-    if args.use_cpu and args.model_type in ["vllm"]:
-        print(f"Error: {args.model_type} can't use cpu!")
-        exit()
+def load_args_from_config(config_path: str):
+    """
+    从配置文件加载参数。
+
+    :param config_path: 配置文件的路径
+    :return: 包含参数的 Namespace 对象
+    """
+    # 读取配置文件
+    with open(config_path, 'r') as f:
+        config_dict = json.load(f)
     
+    args = argparse.Namespace()
+
+    # 遍历字典，将值赋给Namespace对象的属性
+    for key, value in config_dict.items():
+        setattr(args, key, value)
+        
     # init task config
     if "all" in args.tasks:
         args.tasks = TASK_LIST
     
-    for task in args.tasks:
-        assert task in args.tasks
-    
-    if args.config_path:
-        with open(args.config_path, "r") as f:
-            args.tasks_config = json.load(f)
-    else:
-        args.tasks_config = {}
-    
-    def merge_dicts(d1, d2):
-        # 递归地将将d2合并进d1
-        for key, value in d2.items():
-            if key in d1:
-                if isinstance(d1[key], dict) and isinstance(value, dict):
-                    merge_dicts(d1[key], value)  # 递归合并子字典
-                else:
-                    continue  # 如果d1已有此键值，跳过，不做更改
-            else:
-                d1[key] = value  # 如果d1没有此键值，添加
-        return d1
-    
-    # 将默认config合并到当前config
+    with open(args.config_path, "r") as f:
+        args.tasks_config = json.load(f)
     for task in args.tasks:
         try:
-            default_config_fn = os.path.join("lm_cute_eval", "tasks", task, f"config_{task}.json")
-            with open(default_config_fn, "r") as f:
+            with open(f"code/tasks/{task}/config_{task}.json", "r") as f:
                 default_task_config =  json.load(f)
             if task not in args.tasks_config:
                 args.tasks_config[task] = default_task_config
-            args.tasks_config[task] = merge_dicts(args.tasks_config[task], default_task_config)
+            for k, v in default_task_config.items():
+                if k not in args.tasks_config[task]:
+                    args.tasks_config[task][k] = v
         except FileNotFoundError:
             pass
-    
-    args.tasks_config = {key: args.tasks_config[key] for key in args.tasks_config if key in args.tasks}  # 删除不评测的任务的config
-
-    if args.no_timestamp:
-        args.save_path = os.path.join(args.output_path, args.save_name)
-    else:
-        t = datetime.datetime.now()
-        args.save_path = os.path.join(args.output_path, f"{t.month}-{t.day}_{t.hour:02d}:{t.minute:02d}_{args.save_name}")
-    
-    os.makedirs(os.path.join(args.save_path, args.temp_file_path), exist_ok=True)
-
-    # save config
-    os.makedirs(args.save_path, exist_ok=True)
-    with open(f"{args.save_path}/config.json", "w") as f:
-        run_config = {**vars(args)}
-        json.dump(run_config, f, indent=4)
-
-
-def finallize(args):
-    os.system(f"rm -r {os.path.join(args.save_path, args.temp_file_path)}")
-
+    if "all" in args.tasks or "mmlu"in args.tasks:
+        if "subjects" not in args.tasks_config["mmlu"]:
+            args.tasks_config["mmlu"]["subjects"] = TASKS_SUBJECTS["mmlu"]
+    return args
 
 def get_tasks_data(args):
     """
@@ -84,7 +65,7 @@ def get_tasks_data(args):
     return tasks_data
 
 
-def run_infer(tasks_data:dict, model, args):
+def run_infer(tasks_data:dict, model:LLM, sampling_params:SamplingParams, args):
     """
     params:
         tasks_data: Dict[task(str), Dict[subject(str), List[item(dict)]]]
@@ -94,8 +75,7 @@ def run_infer(tasks_data:dict, model, args):
     """
     infer_result = dict(tasks_data)
     for round_idx in range(1, args.rounds + 1):
-        if args.rounds > 1:
-            print(f"running infer round {round_idx}")
+        print(f"running infer round {round_idx}")
         # get all prompts
         prompts = []
         for task in tasks_data:
@@ -105,18 +85,15 @@ def run_infer(tasks_data:dict, model, args):
                         prompt = item["instruction"] + item["fewshot_prompt"] + item["prompt_round1"]
                     else:                    
                         history = []
-                        for i in range(1, round_idx):
-                            if i == 1:
-                                history.append((item["instruction"] + item["fewshot_prompt"] + item[f"prompt_round{i}"], item[f"infer_round{i}"]))
-                            else:
-                                history.append((item[f"prompt_round{i}"], item[f"infer_round{i}"]))
-                        query = item[f"prompt_round{round_idx}"]
-                        prompt = MODEL_FORMAT[args.format_type](query, history)
+                        history.append((item[f"prompt_round{1}"], item[f"infer_round{round_idx-1}"]))
+                        query = item[f"prompt_round{round_idx}"]    
+                        prompt = MODEL_FORMAT[args.model_type](query, history)
                     prompts.append(prompt)
 
-        generated_texts = model.generate(prompts)
+        outputs = model.generate(prompts, sampling_params)
+        generated_texts = [output.outputs[0].text for output in outputs]
 
-        if args.save_infer_texts:
+        if args.save_infer_results:
             with open(f"{args.save_path}/infer_round{round_idx}.txt", "w") as f:
                 for x, y in zip(prompts, generated_texts):
                     print("="*20, file=f)
@@ -141,19 +118,19 @@ def run_infer(tasks_data:dict, model, args):
                     item[f"prompt_round{round_idx + 1}"] = args.refine_prompt
     
     return infer_result
-# from FlagEmbedding import BGEM3FlagModel
+
 
 def run_eval(infer_results, args):
     result = defaultdict(dict)
     for round_idx in range(1, args.rounds + 1):
         result[f"round{round_idx}"] = {}
+        print(args.tasks)
         if "xsum" in args.tasks:
             torch.cuda.empty_cache()
-            # model = BGEM3FlagModel('/data1/dcy/downloads/model/BAAI/bge-m3', use_fp16=True)
-            # args.model = model
+            model = BGEM3FlagModel('/data1/dcy/downloads/model/BAAI/bge-m3', use_fp16=True)
+            args.model = model
         for task in args.tasks:
-            if task == "xsum":
-                continue
+            print(task)
             result[f"round{round_idx}"][task] = MATCH_TASK_ANSWER[task](infer_results[task], round_idx, args)
     return result
 
@@ -182,10 +159,12 @@ def save_result(infer_result:dict, score:dict, args):
         score: dict[round{i}(str), dict[task(str), dict[subject(str), item(dict)]]]
     """
     # save infer results in file
+    print("save infer results in file")
     if args.save_infer_results:
         infer_result_path = os.path.join(args.save_path, "infer_results")
         os.makedirs(infer_result_path, exist_ok=True)
         for task in infer_result:
+            print("task")
             task_path = os.path.join(infer_result_path, task)
             os.makedirs(task_path, exist_ok=True)
             for subject in infer_result[task]:
@@ -195,7 +174,7 @@ def save_result(infer_result:dict, score:dict, args):
 
     # save evaluation result
     summary_score = {}
-    for task in args.tasks:
+    for task in tqdm(args.tasks, desc="save evaluation result"):
         for subject in score["round1"][task].keys():
             subject_result_path = os.path.join(args.save_path, "eval_result", task)
             subject_result = {}
@@ -215,52 +194,48 @@ def save_result(infer_result:dict, score:dict, args):
         json.dump(summary_score, f, indent=4)
     print(json.dumps(summary_score, indent=4))
 
+def load_inference_results(infer_result_path: str):
+    """
+    从指定目录加载推断结果到字典中。
 
-def get_args():
-    parser = argparse.ArgumentParser()
-    # model config
-    parser.add_argument("--model_path", type=str)
-    parser.add_argument("--model_type", type=str, default="hf")
-    parser.add_argument("--format_type", type=str, default="default")
-
-    # task config
-    parser.add_argument("--tasks", type=str, nargs="+")
-    parser.add_argument("--config_path", type=str, default=None)
-    parser.add_argument("--data_path", type=str, default="data")
-
-    # save config
-    parser.add_argument("--output_path", type=str, default="output")
-    parser.add_argument("--save_name", type=str)
-    parser.add_argument("--save_infer_results", action="store_true")
-    parser.add_argument("--save_infer_texts", action="store_true")
-    parser.add_argument("--temp_file_path", type=str, default="temp_file")
-    parser.add_argument("--no_timestamp", action="store_true")
-
-    # generate config
-    parser.add_argument("--rounds", type=int, default=1)
-    parser.add_argument("--seed", type=int, default=123456)
-    parser.add_argument("--sampling_params", type=str, default=None)
-    parser.add_argument("--refine_prompt", type=str, default="Please further think about and give me a more precise and professional answer.\n")
-    parser.add_argument("--use_cpu", action="store_true")
-    parser.add_argument("--temperature", type=float, default=None)
-    parser.add_argument("--top_p", type=float, default=None)
-    parser.add_argument("--top_k", type=int, default=None)
-    parser.add_argument("--max_new_tokens", type=int, default=128)
-
-    args = parser.parse_args()
-    return args
+    :param infer_result_path: 包含推断结果文件的目录路径
+    :return: 包含推断结果的字典
+    """
+    infer_result = {}
+    # 遍历目录中的所有文件和文件夹
+    for root, dirs, files in os.walk(infer_result_path):
+        for file in files:
+            # 构建文件的完整路径
+            file_path = os.path.join(root, file)
+            # 检查文件是否是JSON文件
+            if file.endswith('.json'):
+                # 从文件名中提取任务和主题
+                task = os.path.basename(root)
+                subject = os.path.splitext(file)[0]
+                # 打开并读取JSON文件
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    item = json.load(f)
+                    # 将读取的数据添加到字典中
+                    if task not in infer_result:
+                        infer_result[task] = {}
+                    infer_result[task][subject] = item
+    return infer_result
 
 
 def main():
-    args = get_args()
-    initialize(args)
-    tasks_data = get_tasks_data(args)
-    model = initialize_model(args)
-    inference_result = run_infer(tasks_data, model, args)
+    load_path = "/data1/dcy/projects/evaluate/lm-cute-eval/output/7-25_13:09_Llama-3_dpo_1"
+    # load_path = "/data1/dcy/projects/evaluate/lm-cute-eval/output/5-25_02:21_llama3_gen"
+    # load_path = "/data1/dcy/projects/evaluate/lm-cute-eval/output/5-25_02:38_llama3_gen"
+    # load_path = "/data1/dcy/projects/evaluate/lm-cute-eval/output/5-25_02:39_llama3_gen"
+    config_path = os.path.join(load_path, "config.json")
+    result_path = os.path.join(load_path, "infer_results_withoutscore")
+    args = load_args_from_config(config_path)
+    print(args)
+    inference_result = load_inference_results(result_path)
     score = run_eval(inference_result, args)
     save_result(inference_result, score, args)
-    finallize(args)
     
 
 if __name__ == "__main__":
+    torch.cuda.empty_cache()
     main()

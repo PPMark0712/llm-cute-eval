@@ -17,6 +17,10 @@ build/
 develop-eggs/
 dist/
 downloads/
+output1/
+my_output/
+1.txt/
+
 eggs/
 .eggs/
 lib/

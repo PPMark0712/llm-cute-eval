@@ -1,0 +1,43 @@
+{
+    "arc": {
+        "arc_e": {
+            "num_fewshot": 0,
+            "limit": 10
+        },
+        "arc_c": {
+            "num_fewshot": 25,
+            "limit": 10
+        }
+    },
+    "commonsenseqa": {
+        "num_fewshot": 7,
+        "limit": 10
+    },
+    "drop": {
+        "num_fewshot": 8,
+        "limit": 10
+    },
+    "gsm8k": {
+        "num_fewshot": 8,
+        "limit": 10
+    },
+    "hellaswag": {
+        "num_fewshot": 4,
+        "limit": 10
+    },
+    "humaneval": {
+        "limit": 10
+    },
+    "mmlu": {
+        "num_fewshot": 5,
+        "limit": 10
+    },
+    "winogrande": {
+        "num_fewshot": 5,
+        "limit": 10
+    },
+    "xsum":{
+        "num_fewshot": 8,
+        "limit": 10
+    }
+}

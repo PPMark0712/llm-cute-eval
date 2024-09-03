@@ -31,6 +31,17 @@ def match_answer_humaneval(infer_result:dict, round_idx:int, args):
         timeout=0.5,
         problem_file=problem_fn,
     )
+    res = []
+    with open(f"{sample_fn}_results.jsonl", "r") as f:
+        for line in f:
+            res_dict = json.loads(line)
+            res.append(res_dict)
+    for i, item in enumerate(infer_result["humaneval"]):
+        item[f"extract_answer_round{round_idx}"] = res[i]["completion"]
+        if res[i]["passed"]:
+            item[f"judge{round_idx}"] = True
+        else:
+            item[f"judge{round_idx}"] = False
     return {
         "humaneval": {
             "acc": result["pass@1"]
