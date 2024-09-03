@@ -31,7 +31,7 @@ def initialize(args):
         args.tasks_config = {}
     
     def merge_dicts(d1, d2):
-        """递归地将将d2合并进d1"""
+        # 递归地将将d2合并进d1
         for key, value in d2.items():
             if key in d1:
                 if isinstance(d1[key], dict) and isinstance(value, dict):
@@ -42,6 +42,7 @@ def initialize(args):
                 d1[key] = value  # 如果d1没有此键值，添加
         return d1
     
+    # 将默认config合并到当前config
     for task in args.tasks:
         try:
             default_config_fn = os.path.join("lm_cute_eval", "tasks", task, f"config_{task}.json")
@@ -53,6 +54,8 @@ def initialize(args):
         except FileNotFoundError:
             pass
     
+    args.tasks_config = {key: args.tasks_config[key] for key in args.tasks_config if key in args.tasks}  # 删除不评测的任务的config
+
     if args.no_timestamp:
         args.save_path = os.path.join(args.output_path, args.save_name)
     else:

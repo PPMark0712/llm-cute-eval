@@ -17,6 +17,9 @@
     "mmlu": {
         "num_fewshot": 5
     },
+    "rgb": {
+        "limit": null
+    },
     "winogrande": {
         "num_fewshot": 5
     }

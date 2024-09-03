@@ -1,7 +1,5 @@
 import os, json
 
-icleval_dir = os.path.join("data", "tasks", "icleval")
-
 
 def load_data(fn, limit):
     with open(fn, "r") as f:
@@ -12,31 +10,31 @@ def load_data(fn, limit):
 
 
 def load_data_icleval(args):
+    icleval_dir = os.path.join(args.data_path, "tasks", "icleval")
     task_config = args.tasks_config["icleval"]
     task_data = {}
     for subject in task_config["subjects"]:
         subject_fn = os.path.join(icleval_dir, f"{subject}.json")
         subject_data = load_data(subject_fn, task_config["limit"])
         data = []
-        # if subject == "copy_dict_search_string":
-        #     for item in subject_data:
-        #         fewshot_prompt = ""
-        #         for k, v in item["dict"].items():
-        #             fewshot_prompt += f"\"{k}\": \"{v}\"\n"
-        #         data.append({
-        #             **item,
-        #             "instruction": "",
-        #             "fewshot_prompt": fewshot_prompt,
-        #             "prompt_round1": f"\"{item["prompt"]}\": ",
-        #         })
-        # else:
         for item in subject_data:
+            instruction = ""
+            fewshot_prompt = ""
+            prompt = item["prompt"]
+            if subject == "copy_dict_search_string":
+                for k, v in item["dict"].items():
+                    fewshot_prompt += f"\"{k}\": \"{v}\"\n"
+            elif subject == "copy_natural_language_string":
+                fewshot_prompt = item["content"]
+            else:
+                fewshot_prompt = item["examples"]
             data.append({
                 **item,
-                "instruction": "",
-                "fewshot_prompt": item["examples"],
-                "prompt_round1": item["prompt"],
+                "instruction": instruction,
+                "fewshot_prompt": fewshot_prompt,
+                "prompt_round1": prompt,
             })
+        
         task_data.update({subject: data})
     
     return task_data
