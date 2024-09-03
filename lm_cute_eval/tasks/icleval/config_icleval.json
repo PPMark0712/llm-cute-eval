@@ -4,11 +4,14 @@
         "classifier_format",
         "classifier_order",
         "copy_dict_search_number",
+        "copy_dict_search_string",
+        "copy_natural_language_string",
         "generate_count_or_navigation",
         "generate_duplication",
         "generate_format_conversion",
         "generate_list_number",
         "generate_order",
+        "generate_output_format",
         "generate_relation_analysis"
     ],
     "limit": null

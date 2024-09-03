@@ -11,7 +11,7 @@ def init_vllm_model(args):
         sampling_params = SamplingParams(**args.sampling_params)
     else:
         sampling_params = SamplingParams(
-            max_tokens=512,  # 根据需要生成的内容长度来调整
+            max_tokens=128,  # 根据需要生成的内容长度来调整
             temperature=0,
             top_p=0.1,
             top_k=10,
@@ -23,7 +23,8 @@ def init_vllm_model(args):
                 "Text:",
                 "<|end_of_text|>",
                 "<|start_header_id|>",
-                "<|end_header_id|>"
+                "<|end_header_id|>",
+                "Input"
             ]
         )
     return vllm_model, sampling_params

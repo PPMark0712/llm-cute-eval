@@ -13,11 +13,9 @@ for model_name in "${!models[@]}"; do
     python main.py \
         --model_path "$model_path" \
         --model_type default \
-        --sampling_params '{"max_tokens": 100, "stop": ["Input"]}' \
         --tasks rgb icleval \
         --save_name "$model_name" \
-        --save_infer_results \
         --save_infer_texts \
-        --config_path config.json \
+        --config_path config_debug.json \
         --output_path output/debug
 done
