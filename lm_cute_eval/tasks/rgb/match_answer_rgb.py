@@ -37,9 +37,9 @@ def match_answer_rgb(infer_result:dict, round_idx, args):
             else:
                 labels = get_labels(prediction, item["answer"])
 
-            fact_label = 1
+            fact_label = 0
             if '事实性错误' in prediction or 'factual errors' in prediction:
-                fact_label = 0
+                fact_label = 1  # 模型能试别出事实性错误
             
             subject_results.append({
                 'labels': labels,
@@ -72,22 +72,24 @@ def match_answer_rgb(infer_result:dict, round_idx, args):
                         correct_cnt += 1
             fact_check_rate = fact_cnt / len(subject_results)
             subject_result.update({
-                "acc": correct_cnt / fact_cnt if fact_cnt else -1,
-                "correct_cnt": correct_cnt,
-                "fact_check_rate": fact_check_rate,  # 带有事实的数据占总数据的比例
-                "fact_cnt": fact_cnt / len(subject_results),  # 带有事实的数据的条数
+                "acc": correct_cnt / fact_cnt if fact_cnt else 0,
+                "correct_cnt": correct_cnt,  # 
+                "fact_check_rate": fact_check_rate,  # 检查出事实冲突的比例
+                "fact_cnt": fact_cnt,  # 检查出事实冲突的条数
             })
 
         result[subject] = subject_result
-    
+
     summary_correct_cnt = 0
     all_total_cnt = 0
     for subject in task_config["subjects"]:
-        summary_correct_cnt += result[subject]["correct_cnt"]
+        all_total_cnt += result[subject]["total_cnt"]
         if "_fact" in subject:
-            all_total_cnt += result[subject]["fact_cnt"]
+            summary_correct_cnt += result[subject]["correct_cnt"]
+            # summary_correct_cnt += result[subject]["fact_cnt"]
         else:
-            all_total_cnt += result[subject]["total_cnt"]
+            summary_correct_cnt += result[subject]["correct_cnt"]
+
     result["rgb"] = {
         "acc": summary_correct_cnt / all_total_cnt
     }

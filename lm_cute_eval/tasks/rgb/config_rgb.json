@@ -1,7 +1,7 @@
 {
     "subjects": ["en_fact", "en_int", "en_refine", "en", "zh_fact", "zh_int", "zh_refine", "zh"],
     "limit": null,
-    "noise_rate": 0.2,
+    "noise_rate": 0.4,
     "passage_num": 5,
-    "correct_rate": 0.6
+    "correct_rate": 0.2
 }

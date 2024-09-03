@@ -3,20 +3,18 @@ import json
 import argparse
 import os
 from collections import defaultdict
-import torch
 from tqdm import tqdm
-from vllm import LLM, SamplingParams
 import os
 
-from .model import init_vllm_model
+from .model import initialize_model
 from .utils import TASK_LIST, MODEL_FORMAT, LOAD_TASK_DATA, MATCH_TASK_ANSWER
 
 
 def initialize(args):
-    # init args
-    if args.sampling_params:
-        args.sampling_params = json.loads(args.sampling_params)
-
+    if args.use_cpu and args.model_type in ["vllm"]:
+        print(f"Error: {args.model_type} can't use cpu!")
+        exit()
+    
     # init task config
     if "all" in args.tasks:
         args.tasks = TASK_LIST
@@ -74,6 +72,7 @@ def initialize(args):
 def finallize(args):
     os.system(f"rm -r {os.path.join(args.save_path, args.temp_file_path)}")
 
+
 def get_tasks_data(args):
     """
     return:
@@ -85,7 +84,7 @@ def get_tasks_data(args):
     return tasks_data
 
 
-def run_infer(tasks_data:dict, model:LLM, sampling_params:SamplingParams, args):
+def run_infer(tasks_data:dict, model, args):
     """
     params:
         tasks_data: Dict[task(str), Dict[subject(str), List[item(dict)]]]
@@ -112,11 +111,10 @@ def run_infer(tasks_data:dict, model:LLM, sampling_params:SamplingParams, args):
                             else:
                                 history.append((item[f"prompt_round{i}"], item[f"infer_round{i}"]))
                         query = item[f"prompt_round{round_idx}"]
-                        prompt = MODEL_FORMAT[args.model_type](query, history)
+                        prompt = MODEL_FORMAT[args.format_type](query, history)
                     prompts.append(prompt)
 
-        outputs = model.generate(prompts, sampling_params)
-        generated_texts = [output.outputs[0].text for output in outputs]
+        generated_texts = model.generate(prompts)
 
         if args.save_infer_texts:
             with open(f"{args.save_path}/infer_round{round_idx}.txt", "w") as f:
@@ -196,21 +194,35 @@ def save_result(infer_result:dict, score:dict, args):
 
 def get_args():
     parser = argparse.ArgumentParser()
+    # model config
     parser.add_argument("--model_path", type=str)
-    parser.add_argument("--model_type", type=str, default="default")
+    parser.add_argument("--model_type", type=str, default="hf")
+    parser.add_argument("--format_type", type=str, default="default")
+
+    # task config
+    parser.add_argument("--tasks", type=str, nargs="+")
     parser.add_argument("--config_path", type=str, default=None)
     parser.add_argument("--data_path", type=str, default="data")
-    parser.add_argument("--tasks", type=str, nargs="+")
+
+    # save config
     parser.add_argument("--output_path", type=str, default="output")
-    parser.add_argument("--rounds", type=int, default=1)
-    parser.add_argument("--seed", type=int, default=123456)
     parser.add_argument("--save_name", type=str)
     parser.add_argument("--save_infer_results", action="store_true")
     parser.add_argument("--save_infer_texts", action="store_true")
-    parser.add_argument("--sampling_params", type=str, default=None)
-    parser.add_argument("--refine_prompt", type=str, default="Please further think about and give me a more precise and professional answer.\n")
     parser.add_argument("--temp_file_path", type=str, default="temp_file")
     parser.add_argument("--no_timestamp", action="store_true")
+
+    # generate config
+    parser.add_argument("--rounds", type=int, default=1)
+    parser.add_argument("--seed", type=int, default=123456)
+    parser.add_argument("--sampling_params", type=str, default=None)
+    parser.add_argument("--refine_prompt", type=str, default="Please further think about and give me a more precise and professional answer.\n")
+    parser.add_argument("--use_cpu", action="store_true")
+    parser.add_argument("--temperature", type=float, default=None)
+    parser.add_argument("--top_p", type=float, default=None)
+    parser.add_argument("--top_k", type=int, default=None)
+    parser.add_argument("--max_new_tokens", type=int, default=128)
+
     args = parser.parse_args()
     return args
 
@@ -219,8 +231,8 @@ def main():
     args = get_args()
     initialize(args)
     tasks_data = get_tasks_data(args)
-    model, sampling_params = init_vllm_model(args)
-    inference_result = run_infer(tasks_data, model, sampling_params, args)
+    model = initialize_model(args)
+    inference_result = run_infer(tasks_data, model, args)
     score = run_eval(inference_result, args)
     save_result(inference_result, score, args)
     finallize(args)

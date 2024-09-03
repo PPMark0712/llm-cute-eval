@@ -4,15 +4,10 @@ from typing import (
     TypedDict,
 )
 
-Role = Literal["user", "assistant"]
-
 
 class Message(TypedDict):
-    role: Role
+    role: Literal["user", "assistant"]
     content: str
-
-
-Dialog = Sequence[Message]
 
 
 class ChatFormat:
@@ -33,7 +28,7 @@ class ChatFormat:
         tokens.append("<|eot_id|>")
         return tokens
 
-    def add_dialog_prompt(self, dialog: Dialog):
+    def add_dialog_prompt(self, dialog: Sequence[Message]):
         tokens = []
         tokens.append("<|begin_of_text|>")
         for message in dialog:
