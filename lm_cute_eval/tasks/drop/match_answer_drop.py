@@ -2,17 +2,9 @@ import re
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import re
 from scipy.optimize import linear_sum_assignment
-import string, numpy as np
+import string
+import numpy as np
 EXCLUDE = set(string.punctuation)
-
-
-drop_data_pattern = [
-        '\s*answer is\s*([A-Za-z]+)\s*',
-        '\s*answer is\s*(\d+\.?\d*)',
-        '\s*(\d+\.?\d*)\s*',
-        '\s*([A-Za-z]+)\s*',
-    ]
-
 
 def normalize(s: str) -> str:
     """Lower text and remove punctuation, articles and extra whitespace."""
@@ -26,36 +18,35 @@ def normalize(s: str) -> str:
 
 
 def match_answer_drop(infer_result, round_idx, args):
-    exact_match_cnt = 0
-    result = {}
+    drop_answer_patterns = [
+        '\s*answer is\s*([A-Za-z]+)\s*',
+        '\s*answer is\s*(\d+\.?\d*)',
+        '\s*(\d+\.?\d*)\s*',
+        '\s*([A-Za-z]+)\s*',
+    ]    
+    correct_cnt = 0
     for item in infer_result["drop"]:
-        answer = []
-        norm_ref_answer = normalize(item["answer"])
-        answer_asnwer = re.split(r' ', norm_ref_answer)
-        norm_ref_text = normalize(item["ref_text"])
-        answer_text = re.split(r'[|]\s*|\s+', norm_ref_text)
-        answer.extend(answer_asnwer)
-        answer.extend(answer_text)
+        probable_answers = []
+        probable_answers.extend(normalize(item["answer"]).split())
+        probable_answers.extend(re.split(r'[|]\s*|\s+', normalize(item["ref_text"])))
         norm_answer_item = normalize(item[f"infer_round{round_idx}"])
-        for pa in drop_data_pattern:
-            exact_answer = re.findall(pa, norm_answer_item)
-            if exact_answer:
-                break  
-        item[f"judge{round_idx}"] = False
-        if len(exact_answer) > 0:
-            model_answer = exact_answer[0].split(' ')
-            flag = 0
-            for ans1 in model_answer:
-                for ans2 in answer:
-                    if ans1 == ans2:
-                        item[f"exact_match{round_idx}"] = ans2
-                        exact_match_cnt += 1
-                        item[f"judge{round_idx}"] = True
-                        flag = 1
-                        break
-                if flag == 1:
+        extracted_answers = []
+        for pattern in drop_answer_patterns:
+            extracted_answers.extend(re.findall(pattern, norm_answer_item))
+        extracted_answers = list(set(extracted_answers))
+        item[f"extracted_answer_round{round_idx}"] = extracted_answers
+        item[f"judge_round{round_idx}"] = False
+        for extracted_answer in extracted_answers:
+            for word in extracted_answer.split():
+                if word in probable_answers:
+                    correct_cnt += 1
+                    item[f"judge_round{round_idx}"] = True
                     break
-    result["drop"] = {
-        "exact_match": exact_match_cnt / len(infer_result["drop"]),
+            if item[f"judge_round{round_idx}"]:
+                break
+    result = {
+        "drop": {
+            "acc": correct_cnt / len(infer_result["drop"]),
+        }
     }
     return result

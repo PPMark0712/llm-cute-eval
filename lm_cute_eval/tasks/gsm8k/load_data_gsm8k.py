@@ -37,18 +37,16 @@ def get_fewshot_cot_prompt_gsm8k(gsm8k_dir, num_fewshot):
 
 
 def load_data_gsm8k(args):
-    gsm8k_dir = os.path.join("data", "tasks", "gsm8k")
-    gsm8k_instruction = "Solve the following math questions. Please think step by step and finally give the answer.\n\n"
-
+    gsm8k_path = os.path.join(args.data_path, "tasks", "gsm8k")
     task_config = args.tasks_config["gsm8k"]
-    test_data = load_file_gsm8k(os.path.join(gsm8k_dir, "test.jsonl"), task_config["limit"])
+    test_data = load_file_gsm8k(os.path.join(gsm8k_path, "test.jsonl"), task_config["limit"])
     task_data = {"gsm8k": []}
-    fewshot_prompt = get_fewshot_cot_prompt_gsm8k(gsm8k_dir, task_config["num_fewshot"])
+    fewshot_prompt = get_fewshot_cot_prompt_gsm8k(gsm8k_path, task_config["num_fewshot"])
     for item in test_data:
         prompt = "Question: " + item["question"] + "\nAnswer: Let's think step by step\n"
         task_data["gsm8k"].append({
             **item, 
-            "instruction": gsm8k_instruction,
+            "instruction": task_config["instruction"],
             "fewshot_prompt": fewshot_prompt,
             "prompt_round1": prompt,
         })

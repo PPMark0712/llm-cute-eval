@@ -1,4 +1,6 @@
 {
-    "num_fewshot": 7,
+    "instruction": "Here are some multiple-choice questions about continuation writing. Each question contains a paragraph and four options for possible continuations. Choose the most appropriate continuation from options A, B, C, and D.\n\n\n",
+    "question_template": "Question: {question}\nOptions:\n(A) {A}\n(B) {B}\n(C) {C}\n(D) {D}\nAnswer: The most appropriate continuation is ",
+    "num_fewshot": 4,
     "limit": null
 }

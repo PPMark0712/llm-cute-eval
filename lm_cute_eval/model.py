@@ -15,8 +15,8 @@ class VllmModel:
         sampling_kwargs = {
             "top_p": args.top_p,
             "top_k": args.top_k,
-            "max_tokens": args.max_new_tokens,
             "temperature": args.temperature,
+            "max_tokens": args.max_new_tokens,
             "stop": [       
                 "Question:",
                 "</s>",
@@ -29,12 +29,7 @@ class VllmModel:
                 "Input"
             ]
         }
-        if args.top_p:
-            sampling_kwargs.update({"top_p": args.top_p})
-        if args.temperature:
-            sampling_kwargs.update({"temperature": args.temperature})
-        if args.top_k:
-            sampling_kwargs.update({"top_K": args.top_k})
+        sampling_kwargs = {k: v for k, v in sampling_kwargs.items() if v is not None}
         self.sampling_params = SamplingParams(**sampling_kwargs)
     
     def generate(self, prompts):
@@ -53,15 +48,12 @@ class HfModel:
         self.generate_kwargs = {
             "max_new_tokens": args.max_new_tokens,
             "pad_token_id": self.tokenizer.pad_token_id,
+            "temperature": args.temperature,
+            "top_p": args.top_p,
+            "top_k": args.top_k,
+            "do_sample": True,            
         }
-
-        if args.temperature or args.top_p or args.top_k:
-            self.generate_kwargs.update({
-                "temperature": args.temperature,
-                "top_p": args.top_p,
-                "top_k": args.top_k,
-                "do_sample": True,
-            })
+        self.generate_kwargs = {k: v for k, v in self.generate_kwargs.items() if v is not None}
         self.model = AutoModelForCausalLM.from_pretrained(args.model_path).to(self.device)
 
     def generate(self, prompts):
@@ -73,7 +65,7 @@ class HfModel:
                 **self.generate_kwargs
             )
             output = self.tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
-            generated_texts.append(output.strip())
+            generated_texts.append(output[len(prompt):].strip())
         return generated_texts
 
 

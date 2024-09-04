@@ -5,6 +5,7 @@ def match_answer_icleval(infer_result:dict, round_idx:int, args):
         subject_correct_cnt = 0
         total_cnt += len(subject_result)
         for item in subject_result:
+            item[f"judge_round{round_idx}"] = False
             ans = str(item["label"]).strip()
             if subject == "generate_output_format":
                 ans.replace("value", "key")
@@ -13,6 +14,7 @@ def match_answer_icleval(infer_result:dict, round_idx:int, args):
                 else:
                     ans.replace("key", item["ans_content"])
             if ans in item[f"infer_round{round_idx}"]:
+                item[f"judge_round{round_idx}"] = True
                 subject_correct_cnt += 1
         result[subject] = {
             "acc": subject_correct_cnt / len(subject_result)

@@ -1,4 +1,5 @@
 {
+    "instruction": "You will be asked to read a passage and answer a question. Some examples of passages and Q&A are provided below.Think step by step, then write a line of the form 'Answer: $ANSWER' at the end of your response.",
     "num_fewshot": 0,
     "limit": null
 }

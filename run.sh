@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=0
+export CUDA_VISIBLE_DEVICES=3
 export TOKENIZERS_PARALLELISM=false
 
 declare -A models=(
@@ -15,12 +15,17 @@ for model_name in "${!models[@]}"; do
     model_path=${models[$model_name]}
     python main.py \
         --model_path "$model_path" \
-        --model_type hf \
+        --model_type vllm \
         --format_type default \
-        --tasks drop \
+        --tasks all \
         --save_name "$model_name" \
         --save_infer_texts \
-        --config_path config_debug.json \
+        --save_infer_results \
+        --config_path "config_debug.json" \
         --output_path output/debug \
-        --use_cpu
+        --max_new_tokens 180 \
+        --temperature 0.1 \
+        --top_p 0.2 \
+        --top_k 20 \
+
 done

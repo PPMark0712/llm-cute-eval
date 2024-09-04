@@ -5,7 +5,9 @@ import os
 from collections import defaultdict
 from tqdm import tqdm
 import os
+import torch
 
+from .get_multiround_prompt import get_multiround_prompt
 from .model import initialize_model
 from .utils import TASK_LIST, MODEL_FORMAT, LOAD_TASK_DATA, MATCH_TASK_ANSWER
 
@@ -103,6 +105,7 @@ def run_infer(tasks_data:dict, model, args):
                 for item in tasks_data[task][subject]:
                     if round_idx == 1:
                         prompt = item["instruction"] + item["fewshot_prompt"] + item["prompt_round1"]
+                        prompt = MODEL_FORMAT[args.format_type](prompt, history=[])
                     else:                    
                         history = []
                         for i in range(1, round_idx):
@@ -138,42 +141,18 @@ def run_infer(tasks_data:dict, model, args):
         for task in tasks_data:
             for subject in tasks_data[task]:
                 for item in tasks_data[task][subject]:
-                    item[f"prompt_round{round_idx + 1}"] = args.refine_prompt
+                    item[f"prompt_round{round_idx + 1}"] = get_multiround_prompt(round_idx + 1, args)
     
     return infer_result
-# from FlagEmbedding import BGEM3FlagModel
+
 
 def run_eval(infer_results, args):
     result = defaultdict(dict)
     for round_idx in range(1, args.rounds + 1):
         result[f"round{round_idx}"] = {}
-        if "xsum" in args.tasks:
-            torch.cuda.empty_cache()
-            # model = BGEM3FlagModel('/data1/dcy/downloads/model/BAAI/bge-m3', use_fp16=True)
-            # args.model = model
         for task in args.tasks:
-            if task == "xsum":
-                continue
             result[f"round{round_idx}"][task] = MATCH_TASK_ANSWER[task](infer_results[task], round_idx, args)
     return result
-
-def save_result_inference(infer_result:dict, args):
-    """
-        infer_result: dict[task(str), dict[subject(str), item(dict)]]
-        score: dict[round{i}(str), dict[task(str), dict[subject(str), item(dict)]]]
-    """
-    # save infer results in file
-    if args.save_infer_results:
-        infer_result_path = os.path.join(args.save_path, "infer_results_withoutscore")
-        os.makedirs(infer_result_path, exist_ok=True)
-        for task in infer_result:
-            task_path = os.path.join(infer_result_path, task)
-            os.makedirs(task_path, exist_ok=True)
-            for subject in infer_result[task]:
-                subject_filename = os.path.join(task_path, f"{subject}.json")
-                with open(subject_filename, "w") as f:
-                    json.dump(infer_result[task][subject], f, ensure_ascii=False, indent=4)
-
 
 
 def save_result(infer_result:dict, score:dict, args):
@@ -195,8 +174,10 @@ def save_result(infer_result:dict, score:dict, args):
 
     # save evaluation result
     summary_score = {}
+    summary_score_with_subjects = {}
     for task in args.tasks:
-        for subject in score["round1"][task].keys():
+        task_result_with_subjects = {}
+        for subject in infer_result[task]:
             subject_result_path = os.path.join(args.save_path, "eval_result", task)
             subject_result = {}
             for round_idx in range(1, args.rounds + 1):
@@ -205,14 +186,23 @@ def save_result(infer_result:dict, score:dict, args):
             fn = os.path.join(subject_result_path, f"{subject}.json")
             with open(fn, "w") as f:
                 json.dump(subject_result, f, indent=4)
+            
+            if args.rounds == 1:
+                task_result_with_subjects[subject] = subject_result["round1"]
+            else:
+                task_result_with_subjects[subject] = {f"round{round_idx}": subject_result[f"round{round_idx}"] for round_idx in range(1, args.rounds + 1)}
+
         if args.rounds == 1:
             task_result = score[f"round1"][task][task]
         else:
             task_result = {f"round{round_idx}": score[f"round{round_idx}"][task][task] for round_idx in range(1, args.rounds + 1)}
         summary_score[task] = task_result
+        summary_score_with_subjects[task] = task_result_with_subjects
 
     with open(os.path.join(args.save_path, "summary.json"), "w") as f:
         json.dump(summary_score, f, indent=4)
+    with open(os.path.join(args.save_path, "summary_of_subjects.json"), "w") as f:
+        json.dump(summary_score_with_subjects, f, indent=4)
     print(json.dumps(summary_score, indent=4))
 
 
@@ -239,13 +229,11 @@ def get_args():
     # generate config
     parser.add_argument("--rounds", type=int, default=1)
     parser.add_argument("--seed", type=int, default=123456)
-    parser.add_argument("--sampling_params", type=str, default=None)
-    parser.add_argument("--refine_prompt", type=str, default="Please further think about and give me a more precise and professional answer.\n")
     parser.add_argument("--use_cpu", action="store_true")
     parser.add_argument("--temperature", type=float, default=None)
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--top_k", type=int, default=None)
-    parser.add_argument("--max_new_tokens", type=int, default=128)
+    parser.add_argument("--max_new_tokens", type=int, default=160)
 
     args = parser.parse_args()
     return args
