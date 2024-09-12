@@ -41,7 +41,7 @@ def match_answer_gsm8k(infer_result, round_idx, args):
         item[f"flexible_match{round_idx}"] = flexible_answers
 
     result["gsm8k"] = {
-        # "exact_match": exact_match_cnt / len(infer_result["gsm8k"]),
+        "exact_match": exact_match_cnt / len(infer_result["gsm8k"]),
         "flexible_match": flexible_match_cnt / len(infer_result["gsm8k"])
     }
     return result
