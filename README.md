@@ -179,7 +179,7 @@ flexible_match：匹配回答中任何数字，有一个正确则为正确。
 
 ### xsum
 
-数据集来源：[新建标签页 (github.com)](https://github.com/EdinburghNLP/XSum)
+数据集来源：[EdinburghNLP/XSum(github.com)](https://github.com/EdinburghNLP/XSum)
 
 评测指标：用BAAI/bge-m3模型计算和答案的相似度。
 
