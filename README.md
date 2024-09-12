@@ -13,8 +13,8 @@ pip install -r requirements.txt
 下载数据，并将数据文件data.zip解压到项目根目录
 
 ```
-cd lm-cute-eval-main
-wget https://github.com/PPMark0712/lm-cute-eval/releases/download/0.2/data.zip
+cd llm-cute-eval-main
+wget https://github.com/PPMark0712/llm-cute-eval/releases/download/0.2/data.zip
 unzip data.zip
 ```
 
