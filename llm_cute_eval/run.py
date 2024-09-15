@@ -45,15 +45,15 @@ def initialize(args):
     # 将默认config合并到当前config
     for task in args.tasks:
         try:
-            default_config_fn = os.path.join("lm_cute_eval", "tasks", task, f"config_{task}.json")
+            default_config_fn = os.path.join("llm_cute_eval", "tasks", task, f"config_{task}.json")
             with open(default_config_fn, "r") as f:
                 default_task_config =  json.load(f)
             if task not in args.tasks_config:
                 args.tasks_config[task] = default_task_config
             args.tasks_config[task] = merge_dicts(args.tasks_config[task], default_task_config)
         except FileNotFoundError:
-            pass
-    
+            print(f"{task} default config not found!")
+            exit
     args.tasks_config = {key: args.tasks_config[key] for key in args.tasks_config if key in args.tasks}  # 删除不评测的任务的config
 
     if args.no_timestamp:
