@@ -206,7 +206,7 @@ def save_result(infer_result:dict, score:dict, args):
     print(json.dumps(summary_score, indent=4))
 
 
-def get_args():
+def parse_args():
     parser = argparse.ArgumentParser()
     # model config
     parser.add_argument("--model_path", type=str, required=True)
@@ -240,7 +240,7 @@ def get_args():
 
 
 def main():
-    args = get_args()
+    args = parse_args()
     initialize(args)
     tasks_data = get_tasks_data(args)
     model = initialize_model(args)
