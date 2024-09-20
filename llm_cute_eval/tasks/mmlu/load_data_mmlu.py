@@ -2,20 +2,20 @@ import os, csv, json
 
 
 
-def format_query_mmlu(data):
-    question_template = """
-Human:
-Q: {Q}
-Which one of the four choices is correct, (A), (B), (C) or (D)?
-Choices: 
-(A) {A}
-(B) {B}
-(C) {C}
-(D) {D}
+def format_query_mmlu(data, question_template):
+#     question_template = """
+# Human:
+# Q: {Q}
+# Which one of the four choices is correct, (A), (B), (C) or (D)?
+# Choices: 
+# (A) {A}
+# (B) {B}
+# (C) {C}
+# (D) {D}
 
-Assistant:
-Let's think step by step. 
-A: """
+# Assistant:
+# Let's think step by step. 
+# A: """
     prompt = question_template.format(
         Q=data["Q"],
         A=data["A"],
@@ -66,7 +66,7 @@ def load_data_mmlu(args):
         instruction, fewshot_cot_prompt = get_inst_and_fewshot_cot(fewshot_data, subject)
         task_data[subject] = []
         for item in subject_data:
-            prompt = format_query_mmlu(item)
+            prompt = format_query_mmlu(item, task_config["question_template"])
             task_data[subject].append({
                 **item,
                 "instruction": instruction,

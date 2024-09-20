@@ -1,15 +1,14 @@
-import re
 from ..match_answer import find_first_selection
 
 
-def match_answer_mmlu(infer_result:dict, round_idx, args):
-    task_config = args.tasks_config["mmlu"]
+def match_answer_cmmlu(infer_result:dict, round_idx, args):
+    task_config = args.tasks_config["cmmlu"]
     result = {}
     for subject in task_config["subjects"]:
         correct_cnt = 0
         for item in infer_result[subject]:
             model_answer = find_first_selection(item[f"infer_round{round_idx}"])
-            item[f"extract_answer_round{round_idx}"] = model_answer
+            item[f"extracted_answer_round{round_idx}"] = model_answer
             item[f"judge_round{round_idx}"] = False
             if model_answer == item["ans"]:
                 correct_cnt += 1
@@ -22,7 +21,7 @@ def match_answer_mmlu(infer_result:dict, round_idx, args):
             "total_cnt": len(infer_result[subject])
         }
 
-    result["mmlu"] = {
+    result["cmmlu"] = {
         "acc": sum([result[subject]["correct_cnt"] for subject in task_config["subjects"]]) / sum([result[subject]["total_cnt"] for subject in task_config["subjects"]])
     }
     return result

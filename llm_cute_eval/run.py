@@ -68,7 +68,7 @@ def initialize(args):
     os.makedirs(args.save_path, exist_ok=True)
     with open(f"{args.save_path}/config.json", "w") as f:
         run_config = {**vars(args)}
-        json.dump(run_config, f, indent=4)
+        json.dump(run_config, f, indent=4, ensure_ascii=False)
 
 
 def finallize(args):
@@ -209,8 +209,8 @@ def save_result(infer_result:dict, score:dict, args):
 def get_args():
     parser = argparse.ArgumentParser()
     # model config
-    parser.add_argument("--model_path", type=str)
-    parser.add_argument("--model_type", type=str, default="hf")
+    parser.add_argument("--model_path", type=str, required=True)
+    parser.add_argument("--model_type", type=str, default="vllm")
     parser.add_argument("--format_type", type=str, default="default")
 
     # task config
@@ -220,7 +220,7 @@ def get_args():
 
     # save config
     parser.add_argument("--output_path", type=str, default="output")
-    parser.add_argument("--save_name", type=str)
+    parser.add_argument("--save_name", type=str, required=True)
     parser.add_argument("--save_infer_results", action="store_true")
     parser.add_argument("--save_infer_texts", action="store_true")
     parser.add_argument("--temp_file_path", type=str, default="temp_file")
@@ -228,12 +228,12 @@ def get_args():
 
     # generate config
     parser.add_argument("--rounds", type=int, default=1)
-    parser.add_argument("--seed", type=int, default=123456)
+    parser.add_argument("--seed", type=int, default=19260817)
     parser.add_argument("--use_cpu", action="store_true")
     parser.add_argument("--temperature", type=float, default=None)
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--top_k", type=int, default=None)
-    parser.add_argument("--max_new_tokens", type=int, default=160)
+    parser.add_argument("--max_new_tokens", type=int, default=180)
 
     args = parser.parse_args()
     return args

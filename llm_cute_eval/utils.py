@@ -1,5 +1,6 @@
 TASK_LIST = [
     "arc",
+    "cmmlu",
     "commonsenseqa",
     "drop",
     "gsm8k",
