@@ -119,13 +119,13 @@ def run_infer(tasks_data:dict, model, args):
 
         generated_texts = model.generate(prompts)
 
-        if args.save_infer_texts:
-            with open(f"{args.save_path}/infer_round{round_idx}.txt", "w") as f:
-                for x, y in zip(prompts, generated_texts):
-                    print("=" * 20, file=f)
-                    print(x, file=f)
-                    print("-" * 20, file=f)
-                    print(y, file=f)
+        # if args.save_infer_texts:
+        #     with open(f"{args.save_path}/infer_round{round_idx}.txt", "w") as f:
+        #         for x, y in zip(prompts, generated_texts):
+        #             print("=" * 20, file=f)
+        #             print(x, file=f)
+        #             print("-" * 20, file=f)
+        #             print(y, file=f)
         
         # save infer result in this round
         cur_infer_idx = 0
@@ -160,6 +160,38 @@ def save_result(infer_result:dict, score:dict, args):
         infer_result: dict[task(str), dict[subject(str), item(dict)]]
         score: dict[round{i}(str), dict[task(str), dict[subject(str), item(dict)]]]
     """
+    # save infer texts
+    if args.save_infer_texts:
+        text_path = os.path.join(args.save_path, "infer_texts")
+        for task in args.tasks:
+            task_path = os.path.join(text_path, task)
+            os.makedirs(task_path, exist_ok=True)
+            for round_idx in range(1, args.rounds + 1):
+                for subject, subject_data in infer_result[task].items():
+                    subject_dialogs = []
+                    for item in subject_data:
+                        if round_idx == 1:
+                            prompt = item["instruction"] + item["fewshot_prompt"] + item["prompt_round1"]
+                            prompt = MODEL_FORMAT[args.format_type](prompt, history=[])
+                        else:                    
+                            history = []
+                            for i in range(1, round_idx):
+                                if i == 1:
+                                    history.append((item["instruction"] + item["fewshot_prompt"] + item[f"prompt_round{i}"], item[f"infer_round{i}"]))
+                                else:
+                                    history.append((item[f"prompt_round{i}"], item[f"infer_round{i}"]))
+                            query = item[f"prompt_round{round_idx}"]
+                            prompt = MODEL_FORMAT[args.format_type](query, history)
+                        response = item[f"infer_round{round_idx}"]
+                        subject_dialogs.append((prompt, response))
+                    subject_round_fn = os.path.join(task_path, f"{subject}_round{round_idx}.txt")
+                    with open(subject_round_fn, "w") as f:
+                        for input, output in subject_dialogs:
+                            print("=" * 20, file=f)
+                            print(input, file=f)
+                            print("-" * 20, file=f)
+                            print(output, file=f)
+
     # save infer results in file
     if args.save_infer_results:
         infer_result_path = os.path.join(args.save_path, "infer_results")

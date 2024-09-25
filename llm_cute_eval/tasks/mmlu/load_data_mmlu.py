@@ -2,20 +2,7 @@ import os, csv, json
 
 
 
-def format_query_mmlu(data, question_template):
-#     question_template = """
-# Human:
-# Q: {Q}
-# Which one of the four choices is correct, (A), (B), (C) or (D)?
-# Choices: 
-# (A) {A}
-# (B) {B}
-# (C) {C}
-# (D) {D}
-
-# Assistant:
-# Let's think step by step. 
-# A: """
+def format_query_mmlu(data, question_template, has_answer=False):
     prompt = question_template.format(
         Q=data["Q"],
         A=data["A"],
@@ -23,6 +10,8 @@ def format_query_mmlu(data, question_template):
         C=data["C"],
         D=data["D"]
     )
+    if has_answer:
+        prompt += f"{data['ans']}).\n\n"
     return prompt
 
 
@@ -44,33 +33,53 @@ def load_file_mmlu(fn, limit=0):
     return data
 
 
-def get_inst_and_fewshot_cot(fewshot_data, subject):
+def get_inst_and_fewshot_cot(fewshot_data, subject, num_fewshots):
     text = fewshot_data[subject].strip()
     idx = text.find("Q:")
     instruction = text[:idx]
-    fewshot_cot_prompt = text[idx:]
+    fewshot_cot_prompt = text[idx:] + "\n\n\n\n"
     return instruction, fewshot_cot_prompt
 
 
+def get_fewshot_prompt(fewshot_data, config):
+    assert 0 <= config["num_fewshots"] <= 5
+    fewshot_prompt = ""
+    for item in fewshot_data:
+        fewshot_prompt += format_query_mmlu(item, config["question_template"], True)
+    return fewshot_prompt
+
+
 def load_data_mmlu(args):
-    mmlu_dir = os.path.join(args.data_path, "tasks", "mmlu")
+    mmlu_path = os.path.join(args.data_path, "tasks", "mmlu")
     task_config = args.tasks_config["mmlu"]
-    fewshot_fn = os.path.join(mmlu_dir, "fewshot-cot", "mmlu-cot-claude-multiple.json")
-    with open(fewshot_fn, "r") as f:
-        fewshot_data = json.load(f)
+
+    if task_config["use_cot"]:
+        fewshot_cot_fn = os.path.join(mmlu_path, "fewshot-cot", "mmlu-cot-claude-multiple.json")
+        with open(fewshot_cot_fn, "r") as f:
+            fewshot_cot_data = json.load(f)
+    
     task_data = {}
     subjects = task_config["subjects"]
     for subject in subjects:
-        fn = os.path.join(mmlu_dir, "test", f"{subject}_test.csv")
+        fn = os.path.join(mmlu_path, "test", f"{subject}_test.csv")
         subject_data = load_file_mmlu(fn, task_config["limit"])
-        instruction, fewshot_cot_prompt = get_inst_and_fewshot_cot(fewshot_data, subject)
+        if task_config["use_cot"]:
+            instruction, fewshot_prompt = get_inst_and_fewshot_cot(fewshot_cot_data, subject, task_config["num_fewshots"])
+        else:
+            instruction = task_config["instruction_template"].format(subject=subject)
+            fewshot_fn = os.path.join(mmlu_path, "dev", f"{subject}_dev.csv")
+            fewshot_data = load_file_mmlu(fewshot_fn, task_config["num_fewshots"])
+            fewshot_prompt = get_fewshot_prompt(fewshot_data, task_config)
         task_data[subject] = []
         for item in subject_data:
-            prompt = format_query_mmlu(item, task_config["question_template"])
+            if task_config["use_cot"]:
+                prompt = format_query_mmlu(item, task_config["question_template_cot"])
+            else:
+                prompt = format_query_mmlu(item, task_config["question_template"])
             task_data[subject].append({
                 **item,
                 "instruction": instruction,
-                "fewshot_prompt": fewshot_cot_prompt,
+                "fewshot_prompt": fewshot_prompt,
                 "prompt_round1": prompt,
             })
     return task_data

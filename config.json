@@ -1,23 +1,23 @@
 {
     "arc": {
         "arc_e": {
-            "num_fewshot": 0
+            "num_fewshots": 0
         },
         "arc_c": {
-            "num_fewshot": 25
+            "num_fewshots": 25
         }
     },
     "commonsenseqa": {
-        "num_fewshot": 7
+        "num_fewshots": 7
     },
     "drop": {
-        "num_fewshot": 5
+        "num_fewshots": 5
     },
     "gsm8k": {
-        "num_fewshot": 8
+        "num_fewshots": 8
     },
     "hellaswag": {
-        "num_fewshot": 4
+        "num_fewshots": 4
     },
     "humaneval": {
         "limit": null
@@ -26,15 +26,15 @@
         "limit": null
     },
     "mmlu": {
-        "num_fewshot": 5
+        "num_fewshots": 5
     },
     "rgb": {
         "limit": null
     },
     "winogrande": {
-        "num_fewshot": 5
+        "num_fewshots": 5
     },
     "xsum":{
-        "num_fewshot": 5
+        "num_fewshots": 5
     }
 }

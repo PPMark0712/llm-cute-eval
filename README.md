@@ -1,4 +1,6 @@
-# lm-cute-eval：一个轻量级的大语言模型评测框架
+# llm-cute-eval：一个轻量级的大语言模型评测框架
+
+[![GitHub Repo stars](https://img.shields.io/github/stars/PPMark0712/llm-cute-eval?style=social)](https://github.com/hiyouga/LLaMA-Factory/stargazers)
 
 这是一个轻量级的大语言模型评测框架，目前支持少量常用评测集，其优点在于不同任务模块之间解耦，扩展性强，可以较方便地添加新的任务。该评测框架使用transformers和vllm库进行推理。
 
@@ -75,7 +77,7 @@ for model_name in "${!models[@]}"; do
         --config_path "config.json" \
         --output_path output/debug \
         --max_new_tokens 180 \
-        --temperature 0.1 \
+        --temperature 0 \
         --top_p 0.2 \
         --top_k 20 \
 
@@ -97,11 +99,11 @@ done
 例如:
 {
     "gsm8k": {
-        "num_fewshot": 8,
+        "num_fewshots": 8,
         "limit": 0
     }
     "mmlu": {
-        "num_fewshot": 5,
+        "num_fewshots": 5,
         "limit": null
     }
 }
@@ -111,7 +113,7 @@ done
 
 ```
 limit: (int) 只评测改数据集的前几条。若为0或null，则全量评测；若改数据集有子任务，则表示每个子任务读取limit条数据。
-num_fewshot: (int) fewshot数量，可以使用默认值，部分数据集的fewshot有取值范围。
+num_fewshots: (int) fewshot数量，可以使用默认值，部分数据集的fewshot有取值范围，且部分数据集无法控制该参数。
 subjects: (list) 需要评测的子任务的名称列表，例如mmlu中有abstract_algebra, anatomy_test
 ```
 
@@ -131,13 +133,19 @@ subjects: (list) 需要评测的子任务的名称列表，例如mmlu中有abstr
 
 评测指标：匹配回答中的第一个选项，判断是否正确。
 
+### drop
+
+数据集来源：
+
+评测指标：正则表达式匹配例如'answer is'后面的回答，如果有一种可能的答案出现在回答中，则为正确。
+
 ### gsm8k
 
 数据集来源：使用huggingface中的数据，fewshot prompt采用了[cot-hub](https://github.com/FranxYao/chain-of-thought-hub)中的部分数据。
 
 评测指标：
 
-exact_match：匹配回答中和四个'#'后面的数字，该数字正确则为正确。
+exact_match(acc)：匹配回答中'####'后面的数字，该数字正确则为正确。
 
 flexible_match：匹配回答中任何数字，有一个正确则为正确。
 
@@ -151,13 +159,13 @@ flexible_match：匹配回答中任何数字，有一个正确则为正确。
 
 数据集来源：使用huggingface中的数据，不能设置fewshot，但是实际使用了2-shot来控制输出格式，便于提取代码块，这个2-shot prompt。
 
-评测指标：找到第一个代码块，并用humaneval库中的评测代码进行评测
+评测指标：找到第一个代码块，并用humaneval库中的评测代码进行评测。
 
 ### icleval
 
 数据集来源：[ICLEval/data/tasks_data](https://github.com/yiye3/ICLEval/tree/main/data/tasks_data)，修复了部分文件中"examples"写成"exmaples"的拼写错误。
 
-评测指标：若标准答案是模型生成文本的子串，则为正确。
+评测指标：若标准答案是回答的子串，则为正确。
 
 ### mmlu
 
@@ -175,7 +183,13 @@ flexible_match：匹配回答中任何数字，有一个正确则为正确。
 
 数据集来源：[chen700564/RGB](https://github.com/chen700564)
 
-评测指标：有一个可能的回答出现在答案里即为正确。
+评测指标：有一个可能的回答出现在回答里即为正确。
+
+### xiezhi
+
+数据集来源：[MikeGu721/XiezhiBenchmark](https://github.com/MikeGu721/XiezhiBenchmark/tree/main/Tasks/Knowledge/Benchmarks/test)
+
+评测指标：答案出现在回答里即为正确。
 
 ### xsum
 
@@ -183,4 +197,4 @@ flexible_match：匹配回答中任何数字，有一个正确则为正确。
 
 评测指标：用BAAI/bge-m3模型计算和答案的相似度。
 
-注意，该功能由于依赖包较复杂，暂未完善，全部被注释掉了，自己配好环境是可以用的。
+注意，该功能由于依赖包相对于其他模块来说较为复杂，因此暂未完善，全部被注释掉了，自己配好环境是可以用的。
