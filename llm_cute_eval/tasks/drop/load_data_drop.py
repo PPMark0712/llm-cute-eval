@@ -11,8 +11,8 @@ def load_file_drop(fn, limit=0):
     return data
 
 
-def get_fewshot_cot_prompt_drop(drop_path, num_fewshot):
-    assert 0 <= num_fewshot <= 8
+def get_fewshot_cot_prompt_drop(drop_path, num_fewshots):
+    assert 0 <= num_fewshots <= 8
     fewshot_cot_fn = os.path.join(drop_path, "fewshot.txt")
     file_str = ""
     with open(fewshot_cot_fn, "r") as f:
@@ -20,7 +20,7 @@ def get_fewshot_cot_prompt_drop(drop_path, num_fewshot):
             file_str += line
     fewshot_prompt = ""
     lst = file_str.split("\n\n")
-    for text in lst[:num_fewshot]:
+    for text in lst[:num_fewshots]:
         fewshot_prompt += text + "\n\n"
     return fewshot_prompt
 
@@ -30,7 +30,7 @@ def load_data_drop(args):
     task_config = args.tasks_config["drop"]
     test_data = load_file_drop(os.path.join(drop_path, "test.jsonl"), task_config["limit"])
     task_data = {"drop": []}
-    fewshot_prompt = get_fewshot_cot_prompt_drop(drop_path, task_config["num_fewshot"])
+    fewshot_prompt = get_fewshot_cot_prompt_drop(drop_path, task_config["num_fewshots"])
     for item in test_data:
         prompt = "Question: " + item["question"] + "\nAnswer: Let's think step by step\n"
         task_data["drop"].append({

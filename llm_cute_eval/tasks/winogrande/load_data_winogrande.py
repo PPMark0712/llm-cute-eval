@@ -30,10 +30,10 @@ def load_file_winogrande(fn, limit=None):
     return data
 
 
-def get_fewshot_prompt_winogrande(winogrande_dir, num_fewshot):
+def get_fewshot_prompt_winogrande(winogrande_dir, num_fewshots):
     fewshot_prompt = ""
     fewshot_fn = os.path.join(winogrande_dir, "train_xs.jsonl")
-    fewshot_data = load_file_winogrande(fewshot_fn, num_fewshot)
+    fewshot_data = load_file_winogrande(fewshot_fn, num_fewshots)
     for item in fewshot_data:
         fewshot_prompt += format_query_winogrande(item, True)
     return fewshot_prompt
@@ -55,7 +55,7 @@ def load_data_winogrande(args):
     task_data = {}
     test_fn = os.path.join(winogrande_dir, "dev.jsonl")
     test_data = load_file_winogrande(test_fn, task_config["limit"])
-    # fewshot_prompt = get_fewshot_prompt_winogrande(winogrande_dir, task_config["num_fewshot"])
+    # fewshot_prompt = get_fewshot_prompt_winogrande(winogrande_dir, task_config["num_fewshots"])
     fewshot_cot_prompt = get_fewshot_cot_prompt_winogrande(winogrande_dir)
     data = []
     for item in test_data:

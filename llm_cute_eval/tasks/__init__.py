@@ -9,6 +9,7 @@ from .icleval.load_data_icleval import load_data_icleval
 from .mmlu.load_data_mmlu import load_data_mmlu
 from .rgb.load_data_rgb import load_data_rgb
 from .winogrande.load_data_winogrande import load_data_winogrande
+from .xiezhi.load_data_xiezhi import load_data_xiezhi
 from .xsum.load_data_xsum import load_data_xsum
 
 
@@ -24,6 +25,7 @@ LOAD_TASK_DATA = {
     "mmlu": load_data_mmlu,
     "rgb": load_data_rgb,
     "winogrande": load_data_winogrande,
+    "xiezhi": load_data_xiezhi,
     "xsum": load_data_xsum,
 }
 
@@ -39,6 +41,7 @@ from .icleval.match_answer_icleval import match_answer_icleval
 from .mmlu.match_answer_mmlu import match_answer_mmlu
 from .rgb.match_answer_rgb import match_answer_rgb
 from .winogrande.match_answer_winogrande import match_answer_winogrande
+from .xiezhi.match_answer_xiezhi import match_answer_xiezhi
 from .xsum.match_answer_xsum import match_answer_xsum
 
 
@@ -54,5 +57,6 @@ MATCH_TASK_ANSWER = {
     "mmlu": match_answer_mmlu,
     "rgb": match_answer_rgb,
     "winogrande": match_answer_winogrande,
+    "xiezhi": match_answer_xiezhi,
     "xsum": match_answer_xsum
 }

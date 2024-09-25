@@ -33,9 +33,9 @@ def load_file_arc(fn, limit=None):
     return data
 
 
-def load_fewshot_data(dev_data, begin_idx, num_fewshot):
+def load_fewshot_data(dev_data, begin_idx, num_fewshots):
     fewshot_prompt = ""
-    for i in range(begin_idx, begin_idx + num_fewshot):
+    for i in range(begin_idx, begin_idx + num_fewshots):
         fewshot_prompt += format_arc_query(dev_data[i % len(dev_data)], True)
     return fewshot_prompt
 
@@ -47,8 +47,8 @@ def load_data_arc(args):
     task_config = args.tasks_config["arc"]
     task_data = {}
     dev_data = {
-        "arc_e": load_file_arc(os.path.join(arc_dir, "ARC-e", "ARC-Easy-Dev.jsonl"), (task_config["arc_e"]["limit"] if task_config["arc_e"]["limit"] else 0) * task_config["arc_e"]["num_fewshot"]),
-        "arc_c": load_file_arc(os.path.join(arc_dir, "ARC-c", "ARC-Challenge-Dev.jsonl"), (task_config["arc_c"]["limit"] if task_config["arc_c"]["limit"] else 0) * task_config["arc_c"]["num_fewshot"]),
+        "arc_e": load_file_arc(os.path.join(arc_dir, "ARC-e", "ARC-Easy-Dev.jsonl"), (task_config["arc_e"]["limit"] if task_config["arc_e"]["limit"] else 0) * task_config["arc_e"]["num_fewshots"]),
+        "arc_c": load_file_arc(os.path.join(arc_dir, "ARC-c", "ARC-Challenge-Dev.jsonl"), (task_config["arc_c"]["limit"] if task_config["arc_c"]["limit"] else 0) * task_config["arc_c"]["num_fewshots"]),
     }
     
     for subject in task_config["subjects"]:
@@ -61,8 +61,8 @@ def load_data_arc(args):
         
         task_data[subject] = []
         for item in subject_data:
-            fewshot_prompt = load_fewshot_data(dev_data[subject], cur_fewshot_begin_idx, task_config[subject]["num_fewshot"])
-            cur_fewshot_begin_idx += task_config[subject]["num_fewshot"]
+            fewshot_prompt = load_fewshot_data(dev_data[subject], cur_fewshot_begin_idx, task_config[subject]["num_fewshots"])
+            cur_fewshot_begin_idx += task_config[subject]["num_fewshots"]
             prompt = format_arc_query(item, False)
             task_data[subject].append({
                 **item,

@@ -10,6 +10,7 @@ TASK_LIST = [
     "mmlu",
     "rgb",
     "winogrande",
+    "xiezhi",
     "xsum",
 ]
 

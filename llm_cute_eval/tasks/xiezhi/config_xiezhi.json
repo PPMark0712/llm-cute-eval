@@ -1,0 +1,8 @@
+{
+    "instruction_template_chn": "接下来我会给你一些选择题，你需要选择最正确的选项，填入的问题空缺处。\n\n",
+    "question_template_chn": "问题：{question}\n选项：{choices}\n答案是：",
+    "instruction_template_eng": "Below are some cloze problems, choose the most suitable answer to fill in the blank.\n\n",
+    "question_template_eng": "Question: {question}\nChoices: {choices}\nThe answer is: ",
+    "subjects": ["xiezhi_inter_chn", "xiezhi_inter_eng", "xiezhi_spec_chn", "xiezhi_spec_eng"],
+    "num_fewshots": 5
+}

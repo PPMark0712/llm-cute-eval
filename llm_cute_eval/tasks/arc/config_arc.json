@@ -3,11 +3,11 @@
         "arc_e", "arc_c"
     ],
     "arc_e": {
-        "num_fewshot": 0,
+        "num_fewshots": 0,
         "limit": null
     },
     "arc_c": {
-        "num_fewshot": 25,
+        "num_fewshots": 25,
         "limit": null
     }
 }

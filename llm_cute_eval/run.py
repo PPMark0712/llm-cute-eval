@@ -22,7 +22,7 @@ def initialize(args):
         args.tasks = TASK_LIST
     
     for task in args.tasks:
-        assert task in args.tasks
+        assert task in args.tasks, f"{task} not exists!"
     
     if args.config_path:
         with open(args.config_path, "r") as f:
@@ -53,22 +53,22 @@ def initialize(args):
             args.tasks_config[task] = merge_dicts(args.tasks_config[task], default_task_config)
         except FileNotFoundError:
             print(f"{task} default config not found!")
-            exit
+            exit()
     args.tasks_config = {key: args.tasks_config[key] for key in args.tasks_config if key in args.tasks}  # 删除不评测的任务的config
 
+    t = datetime.datetime.now()
+    args.start_time = f"{t.year}-{t.month:02d}-{t.day:02d}_{t.hour:02d}:{t.minute:02d}"
     if args.no_timestamp:
         args.save_path = os.path.join(args.output_path, args.save_name)
     else:
-        t = datetime.datetime.now()
-        args.save_path = os.path.join(args.output_path, f"{t.month}-{t.day}_{t.hour:02d}:{t.minute:02d}_{args.save_name}")
+        args.save_path = os.path.join(args.output_path, f"{args.start_time}_{args.save_name}")
     
     os.makedirs(os.path.join(args.save_path, args.temp_file_path), exist_ok=True)
 
     # save config
     os.makedirs(args.save_path, exist_ok=True)
     with open(f"{args.save_path}/config.json", "w") as f:
-        run_config = {**vars(args)}
-        json.dump(run_config, f, indent=4, ensure_ascii=False)
+        json.dump({**vars(args)}, f, indent=4, ensure_ascii=False)
 
 
 def finallize(args):
@@ -122,9 +122,9 @@ def run_infer(tasks_data:dict, model, args):
         if args.save_infer_texts:
             with open(f"{args.save_path}/infer_round{round_idx}.txt", "w") as f:
                 for x, y in zip(prompts, generated_texts):
-                    print("="*20, file=f)
+                    print("=" * 20, file=f)
                     print(x, file=f)
-                    print("-"*20, file=f)
+                    print("-" * 20, file=f)
                     print(y, file=f)
         
         # save infer result in this round

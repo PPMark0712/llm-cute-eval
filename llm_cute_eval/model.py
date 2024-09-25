@@ -17,16 +17,17 @@ class VllmModel:
             "top_k": args.top_k,
             "temperature": args.temperature,
             "max_tokens": args.max_new_tokens,
-            "stop": [       
-                "Question:",
+            "stop": [
                 "</s>",
                 "<|eot_id|>",
-                "Human:", "Q:",
-                "Text:",
+                "Question:",
+                "Human:",
+                "Q:",
                 "<|end_of_text|>",
                 "<|start_header_id|>",
                 "<|end_header_id|>",
-                "Input"
+                "Input",
+                "问题",
             ]
         }
         sampling_kwargs = {k: v for k, v in sampling_kwargs.items() if v is not None}
@@ -45,15 +46,22 @@ class HfModel:
         self.tokenizer = AutoTokenizer.from_pretrained(args.model_path)
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
-        self.generate_kwargs = {
-            "max_new_tokens": args.max_new_tokens,
-            "pad_token_id": self.tokenizer.pad_token_id,
-            "temperature": args.temperature,
-            "top_p": args.top_p,
-            "top_k": args.top_k,
-            "do_sample": True,            
-        }
-        self.generate_kwargs = {k: v for k, v in self.generate_kwargs.items() if v is not None}
+        if args.temperature is not None and args.temperature == 0:
+            self.generate_kwargs = {
+                "max_new_tokens": args.max_new_tokens,
+                "pad_token_id": self.tokenizer.pad_token_id,
+                "do_sample": False
+            }
+        else:
+            self.generate_kwargs = {
+                "max_new_tokens": args.max_new_tokens,
+                "pad_token_id": self.tokenizer.pad_token_id,
+                "temperature": args.temperature,
+                "top_p": args.top_p,
+                "top_k": args.top_k,
+                "do_sample": True,            
+            }
+            self.generate_kwargs = {k: v for k, v in self.generate_kwargs.items() if v is not None}
         self.model = AutoModelForCausalLM.from_pretrained(args.model_path).to(self.device)
 
     def generate(self, prompts):

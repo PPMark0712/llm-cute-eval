@@ -1,7 +1,7 @@
 {
     "instruction_template": "你是{subject}领域的专家，接下来我会问你该领域的选择题，请回答正确选项。\n\n\n",
     "question_template": "问题：{Q}\n（A）{A}\n（B）{B}\n（C）{C}\n（D）{D}\n回答：正确的选项是",
-    "num_fewshot": 5,
+    "num_fewshots": 5,
     "limit": null,
     "subjects": {
         "agronomy": "农学",

@@ -1,5 +1,5 @@
 {
     "instruction": "Solve the following math questions. Please think step by step and finally give the answer.\n\n",
-    "num_fewshot": 8,
+    "num_fewshots": 8,
     "limit": null
 }

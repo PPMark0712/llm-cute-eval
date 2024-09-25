@@ -26,9 +26,9 @@ def match_answer_drop(infer_result, round_idx, args):
     ]    
     correct_cnt = 0
     for item in infer_result["drop"]:
-        probable_answers = []
-        probable_answers.extend(normalize(item["answer"]).split())
-        probable_answers.extend(re.split(r'[|]\s*|\s+', normalize(item["ref_text"])))
+        possible_answers = []
+        possible_answers.extend(normalize(item["answer"]).split())
+        possible_answers.extend(re.split(r'[|]\s*|\s+', normalize(item["ref_text"])))
         norm_answer_item = normalize(item[f"infer_round{round_idx}"])
         extracted_answers = []
         for pattern in drop_answer_patterns:
@@ -38,7 +38,7 @@ def match_answer_drop(infer_result, round_idx, args):
         item[f"judge_round{round_idx}"] = False
         for extracted_answer in extracted_answers:
             for word in extracted_answer.split():
-                if word in probable_answers:
+                if word in possible_answers:
                     correct_cnt += 1
                     item[f"judge_round{round_idx}"] = True
                     break

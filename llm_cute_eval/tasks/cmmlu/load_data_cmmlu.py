@@ -1,4 +1,4 @@
-import os, csv, json
+import os, csv
 
 
 def format_query_cmmlu(data, config, has_answer=False):
@@ -45,7 +45,7 @@ def get_inst_and_fewshot_cot(fewshot_data, subject):
 
 
 def get_fewshot_prompt(data, idx, config):
-    n = config["num_fewshot"]
+    n = config["num_fewshots"]
     fewshot_data = data[idx:idx + n] if idx + n <= len(data) else data[idx:] + data[:idx + n - len(data)]
     fewshot_prompt = ""
     for item in fewshot_data:
@@ -72,7 +72,7 @@ def load_data_cmmlu(args):
         for item in test_data:
             prompt = format_query_cmmlu(item, task_config)
             fewshot_prompt = get_fewshot_prompt(dev_data, dev_idx, task_config)
-            dev_idx = (dev_idx + task_config["num_fewshot"]) % len(dev_data)
+            dev_idx = (dev_idx + task_config["num_fewshots"]) % len(dev_data)
             task_data[subject_en].append({
                 **item,
                 "instruction": instruction,

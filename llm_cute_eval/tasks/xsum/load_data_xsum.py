@@ -11,8 +11,8 @@ def load_file_xsum(fn, limit=0):
     return data
 
 
-def get_fewshot_cot_prompt_xsum(xsum_path, num_fewshot):
-    assert 0 <= num_fewshot <= 8
+def get_fewshot_prompt(xsum_path, num_fewshots):
+    assert 0 <= num_fewshots <= 8
     fewshot_cot_fn = os.path.join(xsum_path, "fewshot.txt")
     file_str = ""
     with open(fewshot_cot_fn, "r") as f:
@@ -20,7 +20,7 @@ def get_fewshot_cot_prompt_xsum(xsum_path, num_fewshot):
             file_str += line
     fewshot_prompt = ""
     lst = file_str.split("\n\n")
-    for text in lst[:num_fewshot]:
+    for text in lst[:num_fewshots]:
         fewshot_prompt += text + "\n\n"
     return fewshot_prompt
 
@@ -30,7 +30,7 @@ def load_data_xsum(args):
     task_config = args.tasks_config["xsum"]
     test_data = load_file_xsum(os.path.join(xsum_path, "test.jsonl"), task_config["limit"])
     task_data = {"xsum": []}
-    fewshot_prompt = get_fewshot_cot_prompt_xsum(xsum_path, task_config["num_fewshot"])
+    fewshot_prompt = get_fewshot_prompt(xsum_path, task_config["num_fewshots"])
     for item in test_data:
         prompt = "Question: " + item["question"] + "\nAnswer:"
         task_data["xsum"].append({

@@ -30,11 +30,11 @@ def load_file_hellaswag(fn, limit=None):
     return data
 
 
-def get_fewshot_prompt_hellaswag(hellaswag_path, question_template, num_fewshot):
-    assert 0 <= num_fewshot <= 25
+def get_fewshot_prompt_hellaswag(hellaswag_path, question_template, num_fewshots):
+    assert 0 <= num_fewshots <= 25
     fewshot_prompt = ""
     fewshot_fn = os.path.join(hellaswag_path, "hellaswag_train_sampled25.jsonl")
-    fewshot_data = load_file_hellaswag(fewshot_fn, num_fewshot)
+    fewshot_data = load_file_hellaswag(fewshot_fn, num_fewshots)
     for item in fewshot_data:
         fewshot_prompt += format_query_hellaswag(question_template, item, True)
     return fewshot_prompt
@@ -47,7 +47,7 @@ def load_data_hellaswag(args):
     task_data = {}
     test_fn = os.path.join(hellaswag_path, "hellaswag.jsonl")
     test_data = load_file_hellaswag(test_fn, task_config["limit"])
-    fewshot_prompt = get_fewshot_prompt_hellaswag(hellaswag_path, question_template, task_config["num_fewshot"])
+    fewshot_prompt = get_fewshot_prompt_hellaswag(hellaswag_path, question_template, task_config["num_fewshots"])
     data = []
     for item in test_data:
         prompt = format_query_hellaswag(question_template, item, False)
