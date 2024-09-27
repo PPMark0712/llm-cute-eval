@@ -16,7 +16,7 @@ pip install -r requirements.txt
 
 ```
 cd llm-cute-eval-main
-wget https://github.com/PPMark0712/llm-cute-eval/releases/download/0.2/data.zip
+wget https://github.com/PPMark0712/llm-cute-eval/releases/download/0.3/data.zip
 unzip data.zip
 ```
 
