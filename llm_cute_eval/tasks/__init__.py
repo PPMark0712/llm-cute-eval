@@ -1,4 +1,5 @@
 from .arc.load_data_arc import load_data_arc
+from .cfinbench.load_data_cfinbench import load_data_cfinbench
 from .cmmlu.load_data_cmmlu import load_data_cmmlu
 from .commonsenseqa.load_data_commonsenseqa import load_data_commonsenseqa
 from .drop.load_data_drop import load_data_drop
@@ -15,6 +16,7 @@ from .xsum.load_data_xsum import load_data_xsum
 
 LOAD_TASK_DATA = {
     "arc": load_data_arc, 
+    "cfinbench": load_data_cfinbench,
     "cmmlu": load_data_cmmlu,
     "commonsenseqa": load_data_commonsenseqa,
     "drop": load_data_drop,
@@ -31,6 +33,7 @@ LOAD_TASK_DATA = {
 
 
 from .arc.match_answer_arc import match_answer_arc
+from .cfinbench.match_answer_cfinbench import match_answer_cfinbench
 from .cmmlu.match_answer_cmmlu import match_answer_cmmlu
 from .commonsenseqa.match_answer_commonsenseqa import match_answer_commonsenseqa
 from .drop.match_answer_drop import match_answer_drop
@@ -47,6 +50,7 @@ from .xsum.match_answer_xsum import match_answer_xsum
 
 MATCH_TASK_ANSWER = {
     "arc": match_answer_arc,
+    "cfinbench": match_answer_cfinbench,
     "cmmlu": match_answer_cmmlu,
     "commonsenseqa": match_answer_commonsenseqa,
     "drop": match_answer_drop,

@@ -1,5 +1,6 @@
 TASK_LIST = [
     "arc",
+    "cfinbench",
     "cmmlu",
     "commonsenseqa",
     "drop",

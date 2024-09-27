@@ -234,7 +234,7 @@ def save_result(infer_result:dict, score:dict, args):
     with open(os.path.join(args.save_path, "summary.json"), "w") as f:
         json.dump(summary_score, f, indent=4)
     with open(os.path.join(args.save_path, "summary_of_subjects.json"), "w") as f:
-        json.dump(summary_score_with_subjects, f, indent=4)
+        json.dump(summary_score_with_subjects, f, indent=4, ensure_ascii=False)
     print(json.dumps(summary_score, indent=4))
 
 
