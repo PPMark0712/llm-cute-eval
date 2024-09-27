@@ -127,6 +127,18 @@ subjects: (list) 需要评测的子任务的名称列表，例如mmlu中有abstr
 
 评测指标：匹配回答中的第一个选项，判断是否正确。
 
+### cfinbench
+
+数据集来源：使用[yanbinwei/CFinBench-Eval](https://github.com/yanbinwei/CFinBench-Eval)中的数据。
+
+评测指标：1、判断题：“正确”/“错误”出现在模型回答里。2、多选题：回答字符串中，句号前的回答和答案一样。3、单选题：匹配回答中的第一个选项。
+
+### cmmlu
+
+数据集来源：使用[opencompass](https://github.com/open-compass/opencompass)中的数据。
+
+评测指标：匹配回答中的第一个选项，判断是否正确。
+
 ### commonsenseqa
 
 数据集来源：使用[opencompass](https://github.com/open-compass/opencompass)中的数据。
