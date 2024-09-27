@@ -1,6 +1,6 @@
 # llm-cute-eval：一个轻量级的大语言模型评测框架
 
-[![GitHub Repo stars](https://img.shields.io/github/stars/PPMark0712/llm-cute-eval?style=social)](https://github.com/hiyouga/LLaMA-Factory/stargazers)
+[![GitHub Repo stars](https://img.shields.io/github/stars/PPMark0712/llm-cute-eval?style=social)](https://github.com/PPMark0712/llm-cute-eval/stargazers)
 
 这是一个轻量级的大语言模型评测框架，目前支持少量常用评测集，其优点在于不同任务模块之间解耦，扩展性强，可以较方便地添加新的任务。该评测框架使用transformers和vllm库进行推理。
 
