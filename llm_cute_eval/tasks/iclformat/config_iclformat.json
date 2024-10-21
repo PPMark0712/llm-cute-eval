@@ -1,0 +1,5 @@
+{
+    "instruction": "Human: Please study the following samples and answer my questions according to the format.\n\nAssistant: Sure, I will study the samples and respond accordingly.\n\n\n",
+    "limit": null,
+    "subjects": ["format_easy", "format_medium", "format_hard", "learn", "rubustness"]
+}

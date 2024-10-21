@@ -7,6 +7,7 @@ TASK_LIST = [
     "gsm8k",
     "hellaswag",
     "humaneval",
+    "iclformat",
     "icleval",
     "mmlu",
     "rgb",
