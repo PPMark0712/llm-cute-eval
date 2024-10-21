@@ -6,6 +6,7 @@ from .drop.load_data_drop import load_data_drop
 from .gsm8k.load_data_gsm8k import load_data_gsm8k
 from .hellaswag.load_data_hellaswag import load_data_hellaswag
 from .humaneval.load_data_humaneval import load_data_humaneval
+from .iclformat.load_data_iclformat import load_data_iclformat
 from .icleval.load_data_icleval import load_data_icleval
 from .mmlu.load_data_mmlu import load_data_mmlu
 from .rgb.load_data_rgb import load_data_rgb
@@ -23,6 +24,7 @@ LOAD_TASK_DATA = {
     "gsm8k": load_data_gsm8k,
     "hellaswag": load_data_hellaswag,
     "humaneval": load_data_humaneval,
+    "iclformat": load_data_iclformat,
     "icleval": load_data_icleval,
     "mmlu": load_data_mmlu,
     "rgb": load_data_rgb,
@@ -40,6 +42,7 @@ from .drop.match_answer_drop import match_answer_drop
 from .gsm8k.match_answer_gsm8k import match_answer_gsm8k
 from .hellaswag.match_answer_hellaswag import match_answer_hellaswag
 from .humaneval.match_answer_humaneval import match_answer_humaneval
+from .iclformat.match_answer_iclformat import match_answer_iclformat
 from .icleval.match_answer_icleval import match_answer_icleval
 from .mmlu.match_answer_mmlu import match_answer_mmlu
 from .rgb.match_answer_rgb import match_answer_rgb
@@ -57,6 +60,7 @@ MATCH_TASK_ANSWER = {
     "gsm8k": match_answer_gsm8k,
     "hellaswag": match_answer_hellaswag,
     "humaneval": match_answer_humaneval,
+    "iclbench": match_answer_iclformat,
     "icleval": match_answer_icleval,
     "mmlu": match_answer_mmlu,
     "rgb": match_answer_rgb,

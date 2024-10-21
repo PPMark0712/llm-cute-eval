@@ -63,7 +63,7 @@ def load_data_cfinbench(args):
                     task_data[subject].append({
                         **item,
                         "q_type": q_type,
-                        "instruction": task_config[f"question_template_{q_type}"],
+                        "instruction": task_config[f"instruction_{q_type}"],
                         "fewshot_prompt": fewshot_prompt,
                         "prompt_round1": prompt,
                     })

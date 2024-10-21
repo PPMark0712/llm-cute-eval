@@ -72,7 +72,7 @@ def match_answer_rgb(infer_result:dict, round_idx, args):
                         correct_cnt += 1
             fact_check_rate = fact_cnt / len(subject_results)
             subject_result.update({
-                "acc": correct_cnt / fact_cnt if fact_cnt else 0,
+                "acc": correct_cnt / len(subject_results),
                 "correct_cnt": correct_cnt,  # 
                 "fact_check_rate": fact_check_rate,  # 检查出事实冲突的比例
                 "fact_cnt": fact_cnt,  # 检查出事实冲突的条数
@@ -94,5 +94,3 @@ def match_answer_rgb(infer_result:dict, round_idx, args):
         "acc": summary_correct_cnt / all_total_cnt
     }
     return result
-            
-
