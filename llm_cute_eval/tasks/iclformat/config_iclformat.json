@@ -1,5 +1,5 @@
 {
-    "instruction": "Human: Please study the following samples and answer my questions according to the format.\n\nAssistant: Sure, I will study the samples and respond accordingly.\n\n\n",
+    "instruction": "Please study the following samples and answer my questions according to the format.\n\n\n",
     "limit": null,
-    "subjects": ["format_easy", "format_medium", "format_hard", "learn", "rubustness"]
+    "subjects": ["format_tree", "struct_to_struct", "struct_to_text", "text_to_struct", "text_to_text"]
 }

@@ -20,7 +20,7 @@ class VllmModel:
             "stop": [
                 "</s>",
                 "<|eot_id|>",
-                "Question:",
+                # "Question:",
                 "Human:",
                 "Q:",
                 "<|end_of_text|>",

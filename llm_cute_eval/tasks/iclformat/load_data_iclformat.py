@@ -8,6 +8,15 @@ def read_file(fn, limit=None):
     return data
 
 
+def get_fewshot_prompt(examples):
+    fewshot_prompt = "<examples>\n"
+    for i, example in enumerate(examples):
+        fewshot_prompt += f"<example_{i + 1}>\n"
+        fewshot_prompt += f"Input:\n<input>\n\n{example['input']}\n\n</input>\n\nOutput:\n<output>\n\n{example['output']}\n\n</output>\n\n"
+        fewshot_prompt += f"</example_{i + 1}>\n"
+    fewshot_prompt += "</examples>\n\nHere comes the official input, please follow the format above to answer me.\n\n"
+    return fewshot_prompt
+
 def load_data_iclformat(args):
     iclbench_path = os.path.join(args.data_path, "tasks", "iclformat")
     task_config = args.tasks_config["iclformat"]
@@ -17,14 +26,13 @@ def load_data_iclformat(args):
         fn = os.path.join(iclbench_path, f"{subject}.json")
         data = read_file(fn, task_config["limit"])
         for item in data:
-            fewshot_prompt = ""
-            for example in item["examples"]:
-                fewshot_prompt += example
+            examples = item["examples"]
+            fewshot_prompt = get_fewshot_prompt(examples)
             task_data[subject].append({
                 **item,
                 "instruction": task_config["instruction"],
                 "fewshot_prompt": fewshot_prompt,
-                "prompt_round1": item["input"],
+                "prompt_round1": "Input:\n<input>\n\n" + item["input"] + "\n\n</input>\n\n",
             })
 
     return task_data

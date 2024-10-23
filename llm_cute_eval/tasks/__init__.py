@@ -60,7 +60,7 @@ MATCH_TASK_ANSWER = {
     "gsm8k": match_answer_gsm8k,
     "hellaswag": match_answer_hellaswag,
     "humaneval": match_answer_humaneval,
-    "iclbench": match_answer_iclformat,
+    "iclformat": match_answer_iclformat,
     "icleval": match_answer_icleval,
     "mmlu": match_answer_mmlu,
     "rgb": match_answer_rgb,
