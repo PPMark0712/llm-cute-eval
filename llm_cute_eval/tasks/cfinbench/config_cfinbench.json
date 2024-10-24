@@ -59,5 +59,11 @@
             "4-10.jsonl": "金融法",
             "4-11.jsonl": "民法"
         }
+    },
+    "sampling_kwargs": {
+        "max_new_tokens": 20,
+        "stop": [
+            "问题"
+        ]
     }
 }

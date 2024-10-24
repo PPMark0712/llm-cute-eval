@@ -1,5 +1,11 @@
 {
     "instruction": "Solve the following math questions. Please think step by step and finally give the answer.\n\n",
     "num_fewshots": 8,
-    "limit": null
+    "limit": null,
+    "sampling_kwargs": {
+        "max_new_tokens": 10,
+        "stop": [
+            "Question:"
+        ]
+    }
 }

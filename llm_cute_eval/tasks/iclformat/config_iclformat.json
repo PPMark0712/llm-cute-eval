@@ -1,5 +1,11 @@
 {
     "instruction": "Please study the following samples and answer my questions according to the format.\n\n\n",
     "limit": null,
-    "subjects": ["format_tree", "struct_to_struct", "struct_to_text", "text_to_struct", "text_to_text"]
+    "subjects": ["bullet_pointed_response", "format_tree", "format_choice", "sentence_structure_paraphrasing", "struct_to_struct", "struct_to_text", "text_to_struct", "text_to_text"],
+    "sampling_kwargs": {
+        "max_new_tokens": 200,
+        "stop": [
+            "Input:"
+        ]
+    }
 }

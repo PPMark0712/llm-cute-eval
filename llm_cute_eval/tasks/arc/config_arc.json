@@ -9,5 +9,8 @@
     "arc_c": {
         "num_fewshots": 25,
         "limit": null
+    },
+    "sampling_kwargs": {
+        "max_new_tokens": 5
     }
 }

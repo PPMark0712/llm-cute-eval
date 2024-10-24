@@ -98,10 +98,21 @@ def run_infer(tasks_data:dict, model, args):
     for round_idx in range(1, args.rounds + 1):
         if args.rounds > 1:
             print(f"running infer round {round_idx}")
-        # get all prompts
-        prompts = []
+
+        # calculate total data count        
+        total_data_cnt = 0
         for task in tasks_data:
             for subject in tasks_data[task]:
+                total_data_cnt += len(tasks_data[task][subject])
+
+        # run tasks
+        generated_texts = []
+        processed_data_cnt = 0
+        for task_id, task in enumerate(tasks_data):
+            print(f"Running task [{task:^15}], task id: {task_id + 1}/{len(tasks_data)}, processed data: {processed_data_cnt}/{total_data_cnt}")
+            prompts = []
+            for subject in tasks_data[task]:
+                processed_data_cnt += len(tasks_data[task][subject])
                 for item in tasks_data[task][subject]:
                     if round_idx == 1:
                         prompt = item["instruction"] + item["fewshot_prompt"] + item["prompt_round1"]
@@ -116,17 +127,8 @@ def run_infer(tasks_data:dict, model, args):
                         query = item[f"prompt_round{round_idx}"]
                         prompt = MODEL_FORMAT[args.format_type](query, history)
                     prompts.append(prompt)
+            generated_texts.extend(model.generate(prompts, args.tasks_config[task].get("sampling_k")))
 
-        generated_texts = model.generate(prompts)
-
-        # if args.save_infer_texts:
-        #     with open(f"{args.save_path}/infer_round{round_idx}.txt", "w") as f:
-        #         for x, y in zip(prompts, generated_texts):
-        #             print("=" * 20, file=f)
-        #             print(x, file=f)
-        #             print("-" * 20, file=f)
-        #             print(y, file=f)
-        
         # save infer result in this round
         cur_infer_idx = 0
         for task in tasks_data:

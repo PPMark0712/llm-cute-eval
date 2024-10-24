@@ -14,5 +14,11 @@
         "generate_output_format",
         "generate_relation_analysis"
     ],
-    "limit": null
+    "limit": null,
+    "sampling_kwargs": {
+        "max_new_tokens": 150,
+        "stop": [
+            "Input:"
+        ]
+    }
 }

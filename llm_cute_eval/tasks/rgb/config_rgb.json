@@ -3,5 +3,8 @@
     "limit": null,
     "noise_rate": 0.6,
     "passage_num": 5,
-    "correct_rate": 0.2
+    "correct_rate": 0.2,
+    "sampling_kwargs": {
+        "max_new_tokens": 20
+    }
 }

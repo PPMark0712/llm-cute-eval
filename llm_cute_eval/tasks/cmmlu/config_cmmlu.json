@@ -71,5 +71,11 @@
         "virology": "病毒学",
         "world_history": "世界历史",
         "world_religions": "世界宗教"
+    },
+    "sampling_kwargs": {
+        "max_new_tokens": 10,
+        "stop": [
+            "问题"
+        ]
     }
 }
