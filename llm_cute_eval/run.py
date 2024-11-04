@@ -25,7 +25,7 @@ def initialize(args):
         assert task in args.tasks, f"{task} not exists!"
     
     if args.config_path:
-        with open(args.config_path, "r") as f:
+        with open(args.config_path, "r", encoding="utf-8") as f:
             args.tasks_config = json.load(f)
     else:
         args.tasks_config = {}
@@ -46,7 +46,7 @@ def initialize(args):
     for task in args.tasks:
         try:
             default_config_fn = os.path.join("llm_cute_eval", "tasks", task, f"config_{task}.json")
-            with open(default_config_fn, "r") as f:
+            with open(default_config_fn, "r", encoding="utf-8") as f:
                 default_task_config =  json.load(f)
             if task not in args.tasks_config:
                 args.tasks_config[task] = default_task_config
@@ -67,7 +67,7 @@ def initialize(args):
 
     # save config
     os.makedirs(args.save_path, exist_ok=True)
-    with open(f"{args.save_path}/config.json", "w") as f:
+    with open(f"{args.save_path}/config.json", "w", encoding="utf-8") as f:
         json.dump({**vars(args)}, f, indent=4, ensure_ascii=False)
 
 
@@ -127,7 +127,7 @@ def run_infer(tasks_data:dict, model, args):
                         query = item[f"prompt_round{round_idx}"]
                         prompt = MODEL_FORMAT[args.format_type](query, history)
                     prompts.append(prompt)
-            generated_texts.extend(model.generate(prompts, args.tasks_config[task].get("sampling_k")))
+            generated_texts.extend(model.generate(prompts, args.tasks_config[task].get("sampling_kwargs")))
 
         # save infer result in this round
         cur_infer_idx = 0
@@ -187,7 +187,7 @@ def save_result(infer_result:dict, score:dict, args):
                         response = item[f"infer_round{round_idx}"]
                         subject_dialogs.append((prompt, response))
                     subject_round_fn = os.path.join(task_path, f"{subject}_round{round_idx}.txt")
-                    with open(subject_round_fn, "w") as f:
+                    with open(subject_round_fn, "w", encoding="utf-8") as f:
                         for input, output in subject_dialogs:
                             print("=" * 20, file=f)
                             print(input, file=f)
@@ -203,7 +203,7 @@ def save_result(infer_result:dict, score:dict, args):
             os.makedirs(task_path, exist_ok=True)
             for subject in infer_result[task]:
                 subject_filename = os.path.join(task_path, f"{subject}.json")
-                with open(subject_filename, "w") as f:
+                with open(subject_filename, "w", encoding="utf-8") as f:
                     json.dump(infer_result[task][subject], f, ensure_ascii=False, indent=4)
 
     # save evaluation result
@@ -218,7 +218,7 @@ def save_result(infer_result:dict, score:dict, args):
                 subject_result[f"round{round_idx}"] = score[f"round{round_idx}"][task][subject]
             os.makedirs(subject_result_path, exist_ok=True)
             fn = os.path.join(subject_result_path, f"{subject}.json")
-            with open(fn, "w") as f:
+            with open(fn, "w", encoding="utf-8") as f:
                 json.dump(subject_result, f, indent=4)
             
             if args.rounds == 1:
@@ -233,9 +233,9 @@ def save_result(infer_result:dict, score:dict, args):
         summary_score[task] = task_result
         summary_score_with_subjects[task] = task_result_with_subjects
 
-    with open(os.path.join(args.save_path, "summary.json"), "w") as f:
+    with open(os.path.join(args.save_path, "summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary_score, f, indent=4)
-    with open(os.path.join(args.save_path, "summary_of_subjects.json"), "w") as f:
+    with open(os.path.join(args.save_path, "summary_of_subjects.json"), "w", encoding="utf-8") as f:
         json.dump(summary_score_with_subjects, f, indent=4, ensure_ascii=False)
     print(json.dumps(summary_score, indent=4))
 

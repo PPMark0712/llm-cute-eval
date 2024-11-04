@@ -11,12 +11,15 @@ def match_answer_mmlu(infer_result:dict, round_idx, args):
     for subject in task_config["subjects"]:
         correct_cnt = 0
         for item in infer_result[subject]:
-            match = re.search(mmlu_pattern, item[f"infer_round{round_idx}"])
-            if match:
-                model_answer = match.group(1)
+            if task_config["use_cot"]:
+                match = re.search(mmlu_pattern, item[f"infer_round{round_idx}"])
+                if match:
+                    model_answer = match.group(1)
+                else:
+                    model_answer = None
+                    model_answer = find_first_selection(item[f"infer_round{round_idx}"])
             else:
-                model_answer = None
-                # model_answer = find_first_selection(item[f"infer_round{round_idx}"])
+                model_answer = find_first_selection(item[f"infer_round{round_idx}"])
             item[f"extracted_answer_round{round_idx}"] = model_answer
             item[f"judge_round{round_idx}"] = False
             if model_answer == item["ans"]:

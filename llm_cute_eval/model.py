@@ -35,14 +35,13 @@ class VllmModel:
     def generate(self, prompts, new_sampling_kwargs=None):
         sampling_kwargs = self.sampling_kwargs
         if new_sampling_kwargs:
-            for k, v in new_sampling_kwargs:
+            for k, v in new_sampling_kwargs.items():
                 if k == "max_new_tokens":
                     sampling_kwargs["max_tokens"] = v
                 elif k == "stop":
                     sampling_kwargs["stop"].extend(v)
                 else:
                     sampling_kwargs[k] = v
-            sampling_kwargs.update(new_sampling_kwargs)
         sampling_params = SamplingParams(**sampling_kwargs)
         outputs = self.model.generate(prompts, sampling_params)
         generated_texts = [output.outputs[0].text.strip() for output in outputs]
@@ -77,7 +76,9 @@ class HfModel:
     def generate(self, prompts, new_sampling_kwargs=None):
         sampling_kwargs = self.sampling_kwargs
         if new_sampling_kwargs:
-            sampling_kwargs.update(new_sampling_kwargs)
+            for k, v in new_sampling_kwargs.items():
+                if k in ["top_p", "top_k", "temperature", "do_sample", "max_new_tokens"]:
+                    sampling_kwargs[k] = v
         generated_texts = []
         for prompt in tqdm(prompts, desc="infering"):
             inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)

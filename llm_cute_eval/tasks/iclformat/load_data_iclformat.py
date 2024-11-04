@@ -21,7 +21,9 @@ def load_data_iclformat(args):
     iclbench_path = os.path.join(args.data_path, "tasks", "iclformat")
     task_config = args.tasks_config["iclformat"]
     task_data = {}
+    overall_inst = task_config["instruction"]["default"]
     for subject in task_config["subjects"]:
+        inst = overall_inst + "\n\n\n" + task_config["instruction"][subject] + "\n\n\n"
         task_data[subject] = []
         fn = os.path.join(iclbench_path, f"{subject}.json")
         data = read_file(fn, task_config["limit"])
@@ -30,7 +32,7 @@ def load_data_iclformat(args):
             fewshot_prompt = get_fewshot_prompt(examples)
             task_data[subject].append({
                 **item,
-                "instruction": task_config["instruction"],
+                "instruction": inst,
                 "fewshot_prompt": fewshot_prompt,
                 "prompt_round1": "Input:\n<input>\n\n" + item["input"] + "\n\n</input>\n\n",
             })

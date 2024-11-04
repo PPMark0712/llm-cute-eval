@@ -4,6 +4,9 @@
     "num_fewshots": 7,
     "limit": null,
     "sampling_kwargs": {
-        "max_new_tokens": 5
+        "max_new_tokens": 5,
+        "stop": [
+            "Question:"
+        ]
     }
 }
