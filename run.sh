@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=7
+export CUDA_VISIBLE_DEVICES=3
 export TOKENIZERS_PARALLELISM=false
 
 declare -A models=(
@@ -13,7 +13,7 @@ for model_name in "${!models[@]}"; do
         --model_path "$model_path" \
         --model_type vllm \
         --format_type default \
-        --tasks iclformat \
+        --tasks cmmlu mmlu cfinbench gsm8k icleval rgb \
         --save_name "$model_name" \
         --save_infer_texts \
         --save_infer_results \

@@ -1,4 +1,5 @@
 # Byte-compiled / optimized / DLL files
+run.sh
 data/
 output/
 config_debug.json

@@ -45,12 +45,11 @@ temp_file_path(不需要修改): 临时文件保存目录，主要用于humaneva
 rounds: 推理轮数（用于其他实验，需要自己控制中间对话的prompt，具体见lm_cute_eval/get_multiround_prompt.py。
 seed: 随机种子。
 use_cpu(不需要使用): 使用CPU推理(用于debug)。
-temperature:模型推理参数
-top_p:模型推理参数
-top_k:模型推理参数
-max_new_tokens: 最多生成的token数量，默认160，不同数据集不一样，且本框架不可以分开设置每个任务的new token数量，所以取了个较大的值。
+temperature: 模型温度
+top_p: 模型推理采样参数
+top_k: 模型推理采样参数
+max_new_tokens: 最多生成的token数量。
 ```
-
 
 
 例如你想用mmlu和gsm8k评测两个模型：
@@ -87,7 +86,7 @@ done
 
 配置config：
 
-根目录下，有默认config.json文件，在每个数据集的config文件中也又默认值，可以根据需要来修改config中的内容，其格式如下：
+根目录下，有默认config.json文件，在每个数据集的config文件中也有默认值，可以根据需要来修改config中的内容，其格式如下：
 
 ```
 {
@@ -109,13 +108,7 @@ done
 }
 ```
 
-若某一项的config为空，则会自动使用对应任务的模块中的config文件
-
-```
-limit: (int) 只评测改数据集的前几条。若为0或null，则全量评测；若改数据集有子任务，则表示每个子任务读取limit条数据。
-num_fewshots: (int) fewshot数量，可以使用默认值，部分数据集的fewshot有取值范围，且部分数据集无法控制该参数。
-subjects: (list) 需要评测的子任务的名称列表，例如mmlu中有abstract_algebra, anatomy_test
-```
+若某一项的config为空，或config中某个key为空，则会自动使用对应任务的模块中的config文件。由于每个任务需要的配置不同，所以需要自定义修改任务配置时，请查看./llm-cute-eval/tasks/<task_name>/config_<task_name>.json文件。
 
 
 
@@ -209,4 +202,4 @@ flexible_match：匹配回答中任何数字，有一个正确则为正确。
 
 评测指标：用BAAI/bge-m3模型计算和答案的相似度。
 
-注意，该功能由于依赖包相对于其他模块来说较为复杂，因此暂未完善，全部被注释掉了，自己配好环境是可以用的。
+注意，xsum任务由于依赖包相对于其他模块来说较为复杂，且需要使用额外的模型路径，因此暂未完善，全部被注释掉了，自己配好环境是可以用的。
