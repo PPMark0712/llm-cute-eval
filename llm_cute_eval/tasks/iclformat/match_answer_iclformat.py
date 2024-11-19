@@ -21,7 +21,6 @@ def check_sentence_structure(s1, s2):
 
 
 def match_answer_iclformat(infer_result:dict, round_idx, args):
-    # pattern = r"<output>(.*?)</output>"
     task_config = args.tasks_config["iclformat"]
     result = {}
     acc_sum = 0
@@ -39,7 +38,7 @@ def match_answer_iclformat(infer_result:dict, round_idx, args):
             if subject in ["format_tree", "struct_to_struct", "struct_to_text", "text_to_struct", "text_to_text"]:
                 if model_response == item["output"].strip():
                     flag = True
-            elif subject == "format_choice":
+            elif subject in ["format_answer", "format_choice"]:
                 if re.match(item["pattern"], model_response):
                     flag = True
             elif subject == "bullet_pointed_response":
@@ -51,7 +50,7 @@ def match_answer_iclformat(infer_result:dict, round_idx, args):
                 # for i in range(min(len(answer_lines), len(item["label_list"]))):
                 #     if not answer_lines[i].startswith(item["label_list"][i]):
                 #         flag = False
-            elif subject == "sentence_structure_paraphrasing":
+            elif subject in ["short_sentence", "long_sentence"]:
                 if check_sentence_structure(model_response, item["input"]):
                     flag = True
             

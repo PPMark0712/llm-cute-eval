@@ -3,7 +3,7 @@
     "num_fewshots": 8,
     "limit": null,
     "sampling_kwargs": {
-        "max_new_tokens": 10,
+        "max_new_tokens": 300,
         "stop": [
             "Question:"
         ]

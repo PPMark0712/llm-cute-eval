@@ -16,16 +16,11 @@ class VllmModel:
             "top_p": args.top_p,
             "top_k": args.top_k,
             "temperature": args.temperature,
-            "max_tokens": args.max_new_tokens,
             "stop": [
                 "</s>",
                 "<|eot_id|>",
-                # "Question:",
-                "Human:",
-                "Q:",
                 "<|end_of_text|>",
-                "<|start_header_id|>",
-                "<|end_header_id|>",
+                "<im_end>",
                 "Input",
                 "问题",
             ]

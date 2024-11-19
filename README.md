@@ -48,7 +48,6 @@ use_cpu(不需要使用): 使用CPU推理(用于debug)。
 temperature: 模型温度
 top_p: 模型推理采样参数
 top_k: 模型推理采样参数
-max_new_tokens: 最多生成的token数量。
 ```
 
 
@@ -75,7 +74,6 @@ for model_name in "${!models[@]}"; do
         --save_infer_results \
         --config_path "config.json" \
         --output_path output/debug \
-        --max_new_tokens 180 \
         --temperature 0 \
         --top_p 0.2 \
         --top_k 20 \

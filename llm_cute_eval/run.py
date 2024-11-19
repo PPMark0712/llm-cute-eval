@@ -267,7 +267,6 @@ def parse_args():
     parser.add_argument("--temperature", type=float, default=None)
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--top_k", type=int, default=None)
-    parser.add_argument("--max_new_tokens", type=int, default=180)
 
     args = parser.parse_args()
     return args
