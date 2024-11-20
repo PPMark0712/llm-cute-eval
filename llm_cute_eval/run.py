@@ -5,7 +5,6 @@ import os
 from collections import defaultdict
 from tqdm import tqdm
 import os
-import torch
 
 from .get_multiround_prompt import get_multiround_prompt
 from .model import initialize_model
@@ -110,24 +109,58 @@ def run_infer(tasks_data:dict, model, args):
         processed_data_cnt = 0
         for task_id, task in enumerate(tasks_data):
             print(f"Running task [{task:^15}], task id: {task_id + 1}/{len(tasks_data)}, processed data: {processed_data_cnt}/{total_data_cnt}")
-            prompts = []
-            for subject in tasks_data[task]:
-                processed_data_cnt += len(tasks_data[task][subject])
-                for item in tasks_data[task][subject]:
-                    if round_idx == 1:
-                        prompt = item["instruction"] + item["fewshot_prompt"] + item["prompt_round1"]
-                        prompt = MODEL_FORMAT[args.format_type](prompt, history=[])
-                    else:                    
-                        history = []
-                        for i in range(1, round_idx):
-                            if i == 1:
-                                history.append((item["instruction"] + item["fewshot_prompt"] + item[f"prompt_round{i}"], item[f"infer_round{i}"]))
-                            else:
-                                history.append((item[f"prompt_round{i}"], item[f"infer_round{i}"]))
-                        query = item[f"prompt_round{round_idx}"]
-                        prompt = MODEL_FORMAT[args.format_type](query, history)
-                    prompts.append(prompt)
-            generated_texts.extend(model.generate(prompts, args.tasks_config[task].get("sampling_kwargs")))
+            if args.use_chat:
+                conversations = []
+                for subject in tasks_data[task]:
+                    processed_data_cnt += len(tasks_data[task][subject])
+                    for item in tasks_data[task][subject]:
+                        conversation = [{"role": "system", "content": "You are a helpful assistant."}]
+                        if round_idx == 1:
+                            prompt = item["instruction"] + item["fewshot_prompt"] + item["prompt_round1"]
+                            conversation.append({"role": "user", "content": prompt})
+                        else:
+                            for i in range(1, round_idx):
+                                if i == 1:
+                                    user_prompt = item["instruction"] + item["fewshot_prompt"] + item[f"prompt_round{i}"]
+                                else:
+                                    user_prompt = item[f"prompt_round{i}"]
+                                conversation.extend([
+                                    {
+                                        "role": "user",
+                                        "content": user_prompt
+                                    },
+                                    {
+                                        "role": "assistant",
+                                        "content": item[f"infer_round{i}"]
+                                    }
+                                ])
+                            conversation.append(
+                                {
+                                    "role": "user",
+                                    "content": item[f"prompt_round{round_idx}"]
+                                }
+                            )
+                        conversations.append(conversation)
+                generated_texts.extend(model.chat(conversations, args.tasks_config[task].get("sampling_kwargs")))
+            else:
+                prompts = []
+                for subject in tasks_data[task]:
+                    processed_data_cnt += len(tasks_data[task][subject])
+                    for item in tasks_data[task][subject]:
+                        if round_idx == 1:
+                            prompt = item["instruction"] + item["fewshot_prompt"] + item["prompt_round1"]
+                            prompt = MODEL_FORMAT[args.format_type](prompt, history=[])
+                        else:
+                            history = []
+                            for i in range(1, round_idx):
+                                if i == 1:
+                                    history.append((item["instruction"] + item["fewshot_prompt"] + item[f"prompt_round{i}"], item[f"infer_round{i}"]))
+                                else:
+                                    history.append((item[f"prompt_round{i}"], item[f"infer_round{i}"]))
+                            query = item[f"prompt_round{round_idx}"]
+                            prompt = MODEL_FORMAT[args.format_type](query, history)
+                        prompts.append(prompt)
+                generated_texts.extend(model.generate(prompts, args.tasks_config[task].get("sampling_kwargs")))
 
         # save infer result in this round
         cur_infer_idx = 0
@@ -264,6 +297,7 @@ def parse_args():
     parser.add_argument("--rounds", type=int, default=1)
     parser.add_argument("--seed", type=int, default=19260817)
     parser.add_argument("--use_cpu", action="store_true")
+    parser.add_argument("--use_chat", action="store_true")
     parser.add_argument("--temperature", type=float, default=None)
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--top_k", type=int, default=None)

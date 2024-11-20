@@ -9,6 +9,7 @@ from .humaneval.load_data_humaneval import load_data_humaneval
 from .iclformat.load_data_iclformat import load_data_iclformat
 from .icleval.load_data_icleval import load_data_icleval
 from .mmlu.load_data_mmlu import load_data_mmlu
+from .mmluproplus.load_data_mmluproplus import load_data_mmluproplus
 from .rgb.load_data_rgb import load_data_rgb
 from .winogrande.load_data_winogrande import load_data_winogrande
 from .xiezhi.load_data_xiezhi import load_data_xiezhi
@@ -27,6 +28,7 @@ LOAD_TASK_DATA = {
     "iclformat": load_data_iclformat,
     "icleval": load_data_icleval,
     "mmlu": load_data_mmlu,
+    "mmluproplus": load_data_mmluproplus,
     "rgb": load_data_rgb,
     "winogrande": load_data_winogrande,
     "xiezhi": load_data_xiezhi,
@@ -45,6 +47,7 @@ from .humaneval.match_answer_humaneval import match_answer_humaneval
 from .iclformat.match_answer_iclformat import match_answer_iclformat
 from .icleval.match_answer_icleval import match_answer_icleval
 from .mmlu.match_answer_mmlu import match_answer_mmlu
+from .mmluproplus.match_answer_mmluproplus import match_answer_mmluproplus
 from .rgb.match_answer_rgb import match_answer_rgb
 from .winogrande.match_answer_winogrande import match_answer_winogrande
 from .xiezhi.match_answer_xiezhi import match_answer_xiezhi
@@ -63,6 +66,7 @@ MATCH_TASK_ANSWER = {
     "iclformat": match_answer_iclformat,
     "icleval": match_answer_icleval,
     "mmlu": match_answer_mmlu,
+    "mmluproplus": match_answer_mmluproplus,
     "rgb": match_answer_rgb,
     "winogrande": match_answer_winogrande,
     "xiezhi": match_answer_xiezhi,

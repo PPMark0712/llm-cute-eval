@@ -1,0 +1,8 @@
+{
+    "instruction_template": "The following are multiple choice questions (with answers) about {subject}. Think step by step and then finish your answer with \"the answer is (X)\" where X is the correct letter choice.\n",
+    "limit": null,
+    "subjects": ["business", "law", "psychology", "biology", "chemistry", "history", "other", "health", "economics", "math", "physics", "computer science", "philosophy", "engineering"],
+    "sampling_kwargs": {
+        "max_new_tokens": 50
+    }
+}
