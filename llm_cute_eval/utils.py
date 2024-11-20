@@ -10,6 +10,7 @@ TASK_LIST = [
     "iclformat",
     "icleval",
     "mmlu",
+    "mmluproplus",
     "rgb",
     "winogrande",
     "xiezhi",

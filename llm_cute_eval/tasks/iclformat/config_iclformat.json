@@ -1,5 +1,24 @@
 {
-    "instruction": "Human: Please study the following samples and answer my questions according to the format.\n\nAssistant: Sure, I will study the samples and respond accordingly.\n\n\n",
+    "instruction": {
+        "default": "Please study the following samples and answer my questions according to the format.",
+        "format_answer": "Please answer the following questions in the given format.",
+        "format_choice": "Please answer the following multiple-choice questions in the given format.",
+        "format_tree": "Please reformat the tree or bracket sequence according to the provided examples.",
+        "bullet_pointed_response": "Please follow the input-output examples below and answer my questions in bullet points.",
+        "long_sentence": "Please write a new sentence or paragraph, using the same structure and keeping the same punctuation and word count.",
+        "short_sentence": "Please write a new sentence or paragraph, using the same structure and keeping the same punctuation and word count.",
+        "struct_to_struct": "Please reformat the question according to the provided examples.",
+        "struct_to_text": "Please reformat the question according to the provided examples.",
+        "text_to_struct": "Please reformat the question according to the provided examples.",
+        "text_to_text": "Please reformat the question according to the provided examples."
+    },
     "limit": null,
-    "subjects": ["format_easy", "format_medium", "format_hard", "learn", "rubustness"]
+    "subjects": ["bullet_pointed_response", "format_answer", "format_choice", "format_tree", "long_sentence", "short_sentence", "struct_to_struct", "struct_to_text", "text_to_struct", "text_to_text"],
+    "sampling_kwargs": {
+        "max_new_tokens": 200,
+        "stop": [
+            "Input:",
+            "</output>"
+        ]
+    }
 }

@@ -1,6 +1,12 @@
 {
     "instruction": "The following are multiple choice questions about commonsense. Choose A, B, C, D or E to answer the questions.\n\n\n",
-    "question_template": "Question: {question}\n(A){A}\n(B){B}\n(C){C}\n(D){D}\n(E){E}\n\nAnswer: The answer is ",
+    "question_template": "Question: {question}\n(A) {A}\n(B) {B}\n(C) {C}\n(D) {D}\n(E) {E}\n\nAnswer: The answer is ",
     "num_fewshots": 7,
-    "limit": null
+    "limit": null,
+    "sampling_kwargs": {
+        "max_new_tokens": 5,
+        "stop": [
+            "Question:"
+        ]
+    }
 }

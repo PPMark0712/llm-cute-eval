@@ -4,5 +4,12 @@
     "instruction_template_eng": "Below are some cloze problems, choose the most suitable answer to fill in the blank.\n\n",
     "question_template_eng": "Question: {question}\nChoices: {choices}\nThe answer is: ",
     "subjects": ["xiezhi_inter_chn", "xiezhi_inter_eng", "xiezhi_spec_chn", "xiezhi_spec_eng"],
-    "num_fewshots": 5
+    "num_fewshots": 5,
+    "sampling_kwargs": {
+        "max_new_tokens": 15,
+        "stop": [
+            "Question:",
+            "问题："
+        ]
+    }
 }

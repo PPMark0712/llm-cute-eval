@@ -1,10 +1,5 @@
 import re
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
-import re
-from scipy.optimize import linear_sum_assignment
 import string
-import numpy as np
-EXCLUDE = set(string.punctuation)
 
 def normalize(s: str) -> str:
     """Lower text and remove punctuation, articles and extra whitespace."""

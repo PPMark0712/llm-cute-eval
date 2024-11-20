@@ -1,5 +1,11 @@
 {
     "instruction": "You will be asked to read a passage and answer a question. Some examples of passages and Q&A are provided below.Think step by step, then write a line of the form 'Answer: $ANSWER' at the end of your response.",
     "num_fewshots": 0,
-    "limit": null
+    "limit": null,
+    "sampling_kwargs": {
+        "max_new_tokens": 150,
+        "stop": [
+            "Question:"
+        ]
+    }
 }

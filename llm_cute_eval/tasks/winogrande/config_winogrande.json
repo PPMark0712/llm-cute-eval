@@ -1,4 +1,12 @@
 {
+    "question_template": "Question: {question}\nOptions:\n(A) {A}\n(B) {B}\nAnswer:",
+    "instruction": "Below are some cloze questions on general knowledge. Choose the most appropriate option from A or B to fill in the blank (_) in the sentence.\n\n\n",
     "num_fewshots": 5,
-    "limit": null
+    "limit": null,
+    "sampling_kwargs": {
+        "max_new_tokens": 150,
+        "stop": [
+            "Question:"
+        ]
+    }
 }

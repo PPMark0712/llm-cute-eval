@@ -2,11 +2,11 @@
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/PPMark0712/llm-cute-eval?style=social)](https://github.com/PPMark0712/llm-cute-eval/stargazers)
 
-这是一个轻量级的大语言模型评测框架，目前支持少量常用评测集，其优点在于不同任务模块之间解耦，扩展性强，可以较方便地添加新的任务。该评测框架使用transformers和vllm库进行推理。
+这是一个轻量级的大语言模型评测框架，目前支持常用评测集，其优点在于不同任务模块之间解耦，扩展性强，可以较方便地添加新的任务，并且可以支持多轮推理。该评测框架使用vllm库进行加速推理。该框架仅支持生成式评测，不支持困惑度评测方式，因此不适合生成能力较差的小模型。
 
 ## 开始运行
 
-配置环境（用较低版本的库也可以运行，但是没有经过测试）
+配置环境，主要需要torch、transformers、vllm库
 
 ```
 pip install -r requirements.txt
@@ -16,52 +16,53 @@ pip install -r requirements.txt
 
 ```
 cd llm-cute-eval-main
-wget https://github.com/PPMark0712/llm-cute-eval/releases/download/0.3/data.zip
+wget https://github.com/PPMark0712/llm-cute-eval/releases/download/0.4/data.zip
 unzip data.zip
 ```
 
-编辑run.sh脚本，需要考虑的参数如下：
+编辑run.sh脚本，运行参数如下：
 
 ```
+详细内容可查看./llm_cute_eval/run.py中的parse_args函数
+
 模型配置
 model_path: 模型绝对路径
-model_type: 模型变量类型，默认vllm，目前可选vllm和hf
+model_type: 模型变量类型，默认vllm，目前可选vllm或hf
 format_type: 模型类型，用于控制prompt格式，默认default
 
 任务配置
 tasks: 需要评测的任务名称，用空格隔开，例如需要评测mmlu和gsm8k，则在命令中加入--tasks gsm8k mmlu，也可以包含一个all，自动评测所有任务。
-config_path: 任务配置文件路径，缺失值自动填充为对应任务文件夹中的默认config。
-data_path(不需要修改): 数据集路径。
+config_path: 任务配置文件路径，可以为空，缺失值自动填充为对应任务文件夹中的默认config。
+data_path(不需要使用): 数据集路径。
 
 保存配置
-output_path: 输出目录，默认output
+output_path: 输出目录，默认./output
 save_name: 输出文件夹名称。
 save_infer_results: 保存推理结果，而非只保存一个分数
 save_infer_texts: 保存便于阅读的输入输出文本到infer_result{round_idx}.txt
-no_timestamp: 输出文件夹不包含时间，若包含时间，则会保存到"./output/{time}_{model_name}/"中
-temp_file_path(不需要修改): 临时文件保存目录，主要用于humaneval评测集。
+no_timestamp: 输出文件夹不包含时间戳。若包含时间戳，则会保存到"./output/{time}_{model_name}/"中
+temp_file_path(不需要使用): 临时文件保存目录，主要用于humaneval评测集。
 
 推理配置
 rounds: 推理轮数（用于其他实验，需要自己控制中间对话的prompt，具体见lm_cute_eval/get_multiround_prompt.py。
 seed: 随机种子。
 use_cpu(不需要使用): 使用CPU推理(用于debug)。
-temperature:模型推理参数
-top_p:模型推理参数
-top_k:模型推理参数
-max_new_tokens: 最多生成的token数量，默认160，不同数据集不一样，且本框架不可以分开设置每个任务的new token数量，所以取了个较大的值。
+temperature: 模型温度
+top_p: 模型推理采样参数
+top_k: 模型推理采样参数
+use_chat: 使用vllm Engine.chat而非generate
 ```
-
 
 
 例如你想用mmlu和gsm8k评测两个模型：
 
 ```bash
-export CUDA_VISIBLE_DEVICES=3
-export TOKENIZERS_PARALLELISM=false
+export CUDA_VISIBLE_DEVICES=0  # 指定显卡编号
+export TOKENIZERS_PARALLELISM=false  # 在humaneval评测中需要使用
 
-declare -A models=(
-   	["model_name1"]="model_path1"
-	["model_name2"]="model_path2"
+declare -A models=(  # 批量评测模型
+   	["model_name1"]="/path/to/model_1/"
+	["model_name2"]="/path/to/model_2/"
 )
 
 for model_name in "${!models[@]}"; do
@@ -76,10 +77,9 @@ for model_name in "${!models[@]}"; do
         --save_infer_results \
         --config_path "config.json" \
         --output_path output/debug \
-        --max_new_tokens 180 \
         --temperature 0 \
         --top_p 0.2 \
-        --top_k 20 \
+        --top_k 20 
 
 done
 
@@ -87,7 +87,7 @@ done
 
 配置config：
 
-根目录下，有默认config.json文件，在每个数据集的config文件中也又默认值，可以根据需要来修改config中的内容，其格式如下：
+根目录下，有默认config.json文件，在每个数据集的config文件中也有默认值，可以根据需要来修改config中的内容，其格式如下：
 
 ```
 {
@@ -109,13 +109,7 @@ done
 }
 ```
 
-若某一项的config为空，则会自动使用对应任务的模块中的config文件
-
-```
-limit: (int) 只评测改数据集的前几条。若为0或null，则全量评测；若改数据集有子任务，则表示每个子任务读取limit条数据。
-num_fewshots: (int) fewshot数量，可以使用默认值，部分数据集的fewshot有取值范围，且部分数据集无法控制该参数。
-subjects: (list) 需要评测的子任务的名称列表，例如mmlu中有abstract_algebra, anatomy_test
-```
+若某一项的config为空，或config中某个key为空，则会自动使用对应任务的模块中的config文件。由于每个任务需要的配置不同，所以需要自定义修改任务配置时，请查看./llm-cute-eval/tasks/<task_name>/config_<task_name>.json文件。
 
 
 
@@ -153,7 +147,7 @@ subjects: (list) 需要评测的子任务的名称列表，例如mmlu中有abstr
 
 ### gsm8k
 
-数据集来源：使用huggingface中的数据，fewshot prompt采用了[cot-hub](https://github.com/FranxYao/chain-of-thought-hub)中的部分数据。
+数据集来源：使用huggingface中的数据，fewshot prompt采用了[FranxYao/chain-of-thought-hub](https://github.com/FranxYao/chain-of-thought-hub)中的部分数据。
 
 评测指标：
 
@@ -169,9 +163,9 @@ flexible_match：匹配回答中任何数字，有一个正确则为正确。
 
 ### humaneval
 
-数据集来源：使用huggingface中的数据，不能设置fewshot，但是实际使用了2-shot来控制输出格式，便于提取代码块，这个2-shot prompt。
+数据集来源：使用huggingface中的数据，不能设置fewshot，但是实际使用了2-shot来控制输出格式，便于提取代码块。
 
-评测指标：找到第一个代码块，并用humaneval库中的评测代码进行评测。
+评测指标：找到第一个代码块，并用humaneval官方代码仓库[openai/human-eval](https://github.com/openai/human-eval)中的评测代码进行评测。
 
 ### icleval
 
@@ -181,7 +175,12 @@ flexible_match：匹配回答中任何数字，有一个正确则为正确。
 
 ### mmlu
 
-数据集来源：使用[opencompass](https://github.com/open-compass/opencompass)中的数据，以级[cot-hub](https://github.com/FranxYao/chain-of-thought-hub)中的fewshot_cot_prompt。
+数据集来源：使用[opencompass](https://github.com/open-compass/opencompass)中的数据，以级[FranxYao/chain-of-thought-hub](https://github.com/FranxYao/chain-of-thought-hub)中的fewshot_cot_prompt。
+
+评测指标：匹配回答中的第一个选项，判断是否正确。
+
+### mmluproplus（暂未完成）
+
 
 评测指标：匹配回答中的第一个选项，判断是否正确。
 
@@ -203,10 +202,8 @@ flexible_match：匹配回答中任何数字，有一个正确则为正确。
 
 评测指标：答案出现在回答里即为正确。
 
-### xsum
+### xsum（暂未完成）
 
 数据集来源：[EdinburghNLP/XSum(github.com)](https://github.com/EdinburghNLP/XSum)
 
 评测指标：用BAAI/bge-m3模型计算和答案的相似度。
-
-注意，该功能由于依赖包相对于其他模块来说较为复杂，因此暂未完善，全部被注释掉了，自己配好环境是可以用的。
