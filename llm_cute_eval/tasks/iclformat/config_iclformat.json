@@ -5,15 +5,17 @@
         "format_choice": "Please answer the following multiple-choice questions in the given format.",
         "format_tree": "Please reformat the tree or bracket sequence according to the provided examples.",
         "bullet_pointed_response": "Please follow the input-output examples below and answer my questions in bullet points.",
-        "long_sentence": "Please write a new sentence or paragraph, using the same structure and keeping the same punctuation and word count.",
-        "short_sentence": "Please write a new sentence or paragraph, using the same structure and keeping the same punctuation and word count.",
+        "sentence": "Please imitate the English sentences, keeping the sentence structure the same, but with completely different meanings, and avoiding the use of the same vocabulary as much as possible.",
         "struct_to_struct": "Please reformat the question according to the provided examples.",
         "struct_to_text": "Please reformat the question according to the provided examples.",
         "text_to_struct": "Please reformat the question according to the provided examples.",
         "text_to_text": "Please reformat the question according to the provided examples."
     },
+    "parser_path": "/mnt/remote-data/downloads/models/supar/ptb.biaffine.dep.lstm.char",
+    "nltk_path": "/mnt/remote-data/downloads/models/nltk_data",
+    "rouge_threshold": 0.9,
     "limit": null,
-    "subjects": ["bullet_pointed_response", "format_answer", "format_choice", "format_tree", "long_sentence", "short_sentence", "struct_to_struct", "struct_to_text", "text_to_struct", "text_to_text"],
+    "subjects": ["bullet_pointed_response", "format_answer", "format_choice", "format_tree", "sentence", "struct_to_struct", "struct_to_text", "text_to_struct", "text_to_text"],
     "sampling_kwargs": {
         "max_new_tokens": 200,
         "stop": [
