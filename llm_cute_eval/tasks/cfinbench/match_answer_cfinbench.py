@@ -14,21 +14,13 @@ def match_answer_cfinbench(infer_result:dict, round_idx, args):
                 if item["Answer"] in model_response:
                     flag = True
             elif item["q_type"] == "multi_choice":
-                model_answer = model_response.split("。")[0].strip()
-                ans_choices = item["Answer"].split(",")
-                model_choices = []
+                model_answer = model_response.split("。")[0].strip()  # 假设模型按照'答案是：A,B,C。'的形式输出
+                ans_choices = set(item["Answer"].split(","))  # 答案的格式固定，形如A,B,C
+                model_choices = set()
                 for c in model_answer:
                     if c in "ABCDEFG" and c not in model_choices:
-                        model_choices.append(c)
-                flag = True
-                if len(ans_choices) != len(model_choices):
-                    flag = False
-                else:
-                    model_choices.sort()
-                    for c1, c2 in zip(ans_choices, model_choices):
-                        if c1 != c2:
-                            flag = False
-                            break
+                        model_choices.add(c)
+                flag = ans_choices == model_choices
             elif item["q_type"] == "single_choice":
                 if find_first_selection(model_response) == item["Answer"]:
                     flag = True

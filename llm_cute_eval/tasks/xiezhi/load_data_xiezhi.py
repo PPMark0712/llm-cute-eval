@@ -29,7 +29,7 @@ def format_question(item, question_template, has_answer=False):
 
 def load_fewshot_prompt(data, config, language):
     fewshot_prompt = ""
-    for item in data[:config["num_fewshots"]]:
+    for item in data[1:1 + config["num_fewshots"]]:
         fewshot_prompt += format_question(item, config[f"question_template_{language}"], True)
     return fewshot_prompt
 

@@ -11,9 +11,8 @@
         "text_to_struct": "Please reformat the question according to the provided examples.",
         "text_to_text": "Please reformat the question according to the provided examples."
     },
-    "parser_path": "/mnt/remote-data/downloads/models/supar/ptb.biaffine.dep.lstm.char",
+    "parser_path": "/mnt/remote-data/downloads/models/supar/biaffine-dep-en/ptb.biaffine.dep.lstm.char",
     "nltk_path": "/mnt/remote-data/downloads/models/nltk_data",
-    "rouge_threshold": 0.9,
     "limit": null,
     "subjects": ["bullet_pointed_response", "format_answer", "format_choice", "format_tree", "sentence", "struct_to_struct", "struct_to_text", "text_to_struct", "text_to_text"],
     "sampling_kwargs": {

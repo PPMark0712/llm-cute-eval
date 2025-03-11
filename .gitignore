@@ -1,5 +1,7 @@
 # Byte-compiled / optimized / DLL files
 run.sh
+run_multiprocess.sh
+gather_score.sh
 data/
 output/
 config_debug.json

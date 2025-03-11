@@ -1,5 +1,6 @@
 {
     "instruction": "You will be asked to read a dialog and summary the dialog. Some examples of dialogs and summaries are provided below.Think step by step, then write a summary of the form 'Answer: $ANSWER' at the end of your response.",
     "num_fewshots": 1,
+    "emb_model_path": "BAAI/bge-m3",
     "limit": null
 }

@@ -10,7 +10,7 @@ class VllmModel:
         self.model = LLM(
             model=args.model_path, 
             trust_remote_code=True,
-            tensor_parallel_size=torch.cuda.device_count(),
+            tensor_parallel_size=args.tensor_parallel_size,
         )
         sampling_kwargs = {
             "top_p": args.top_p,
@@ -43,7 +43,6 @@ class VllmModel:
         return generated_texts
 
     def chat(self, conversations, new_sampling_kwargs=None):
-        # The only difference from self.generate is that: prompts->conversations, model.generate->model.chat
         sampling_kwargs = self.sampling_kwargs
         if new_sampling_kwargs:
             for k, v in new_sampling_kwargs.items():
@@ -54,7 +53,11 @@ class VllmModel:
                 else:
                     sampling_kwargs[k] = v
         sampling_params = SamplingParams(**sampling_kwargs)
-        outputs = self.model.chat(conversations, sampling_params)
+        prompts = []
+        for conversation in conversations:
+            prompt = self.model.get_tokenizer().apply_chat_template(conversation, tokenize=False)
+            prompts.append(prompt)
+        outputs = self.model.generate(prompts, sampling_params)
         generated_texts = [output.outputs[0].text.strip() for output in outputs]
         return generated_texts
     

@@ -9,11 +9,12 @@ def read_file(fn, limit=None):
 
 
 def get_fewshot_prompt(examples):
-    fewshot_prompt = "Examples:\n"
+    fewshot_prompt = ""
+    # fewshot_prompt = "Examples:\n"
     for i, example in enumerate(examples):
-        fewshot_prompt += f"example {i + 1}:\n"
+        # fewshot_prompt += f"example {i + 1}:\n"
         fewshot_prompt += f"Input:\n{example['input']}\n\nOutput:\n<output>\n\n{example['output']}\n\n</output>\n\n"
-    fewshot_prompt += "Here comes the official input, please follow the format above to answer me.\n\n"
+    # fewshot_prompt += "Here comes the official input, please follow the format above to answer me.\n\n"
     return fewshot_prompt
 
 

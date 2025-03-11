@@ -8,13 +8,14 @@ TASK_LIST = [
     "hellaswag",
     "humaneval",
     "iclformat",
-    "icleval",
+    # "icleval",
+    "math",
     "mmlu",
     "mmluproplus",
     "rgb",
     "winogrande",
     "xiezhi",
-    "xsum",
+    # "xsum",
 ]
 
 from .tasks import LOAD_TASK_DATA, MATCH_TASK_ANSWER
