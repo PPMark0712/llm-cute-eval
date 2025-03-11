@@ -11,7 +11,7 @@ TASK_LIST = [
     # "icleval",
     "math",
     "mmlu",
-    "mmluproplus",
+    # "mmluproplus",
     "rgb",
     "winogrande",
     "xiezhi",
