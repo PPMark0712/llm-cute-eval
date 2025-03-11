@@ -307,8 +307,7 @@ instruction + fewshot_prompt + prompt_round1
 则第二轮的输入为：
 
 ```python
-instruction + fewshot_prompt + prompt_round1 + "\
-n" + infer_round1
+instruction + fewshot_prompt + prompt_round1 + "\n" + infer_round1
 ```
 
 以此类推，可以添加新的多轮对话。
