@@ -277,7 +277,7 @@ MODEL_FORMAT = {
 
 已知执行完`load_data`函数后，单条数据的结构为：
 
-```json
+```python
 {
     **item,
     "instruction": str,
@@ -294,7 +294,7 @@ instruction + fewshot_prompt + prompt_round1
 
 若第一轮推理结束后，单挑数据的结构会新增`infer_round1`字段，表示第一轮推理的输出。
 
-```json
+```python
 {
     **item,
     "instruction": str,
