@@ -5,6 +5,7 @@ import os
 from collections import defaultdict
 from tqdm import tqdm
 import os
+import logging
 
 from .get_multiround_prompt import get_multiround_prompt
 from .model import initialize_model
@@ -12,8 +13,27 @@ from .utils import TASK_LIST, MODEL_FORMAT, LOAD_TASK_DATA, MATCH_TASK_ANSWER
 
 
 def initialize(args):
+    t = datetime.datetime.now()
+    args.start_time = f"{t.year}-{t.month:02d}-{t.day:02d}_{t.hour:02d}:{t.minute:02d}"
+    if args.no_timestamp:
+        args.save_path = os.path.join(args.output_path, args.save_name)
+    else:
+        args.save_path = os.path.join(args.output_path, f"{args.start_time}_{args.save_name}")
+    os.makedirs(args.save_path, exist_ok=True)
+
+    # initialize log
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        handlers=[
+            logging.FileHandler(os.path.join(args.save_path, args.log_fn)),
+            logging.StreamHandler(),
+        ]
+    )
+    logging.info(f"log initialized")
+    
     if args.use_cpu and args.model_type in ["vllm"]:
-        print(f"Error: {args.model_type} can't use cpu!")
+        logging.error(f"Error: {args.model_type} can't use cpu!")
         exit()
     
     # init task config
@@ -51,21 +71,13 @@ def initialize(args):
                 args.tasks_config[task] = default_task_config
             args.tasks_config[task] = merge_dicts(args.tasks_config[task], default_task_config)
         except FileNotFoundError:
-            print(f"{task} default config not found!")
+            logging.error(f"{task} default config not found!")
             exit()
     args.tasks_config = {key: args.tasks_config[key] for key in args.tasks_config if key in args.tasks}  # 删除不评测的任务的config
-
-    t = datetime.datetime.now()
-    args.start_time = f"{t.year}-{t.month:02d}-{t.day:02d}_{t.hour:02d}:{t.minute:02d}"
-    if args.no_timestamp:
-        args.save_path = os.path.join(args.output_path, args.save_name)
-    else:
-        args.save_path = os.path.join(args.output_path, f"{args.start_time}_{args.save_name}")
     
     os.makedirs(os.path.join(args.save_path, args.temp_file_path), exist_ok=True)
 
     # save config
-    os.makedirs(args.save_path, exist_ok=True)
     with open(f"{args.save_path}/config.json", "w", encoding="utf-8") as f:
         json.dump({**vars(args)}, f, indent=4, ensure_ascii=False)
 
@@ -96,7 +108,7 @@ def run_infer(tasks_data:dict, model, args):
     infer_result = dict(tasks_data)
     for round_idx in range(1, args.rounds + 1):
         if args.rounds > 1:
-            print(f"running infer round {round_idx}")
+            logging.info(f"running infer round {round_idx}")
 
         # calculate total data count        
         total_data_cnt = 0
@@ -108,7 +120,7 @@ def run_infer(tasks_data:dict, model, args):
         generated_texts = []
         processed_data_cnt = 0
         for task_id, task in enumerate(tasks_data):
-            print(f"Running task [{task:^15}], task id: {task_id + 1}/{len(tasks_data)}, processed data: {processed_data_cnt}/{total_data_cnt}")
+            logging.info(f"Running task [{task:^15}], task id: {task_id + 1}/{len(tasks_data)}, processed data: {processed_data_cnt}/{total_data_cnt}")
             if args.use_chat:
                 conversations = []
                 for subject in tasks_data[task]:
@@ -182,20 +194,30 @@ def run_infer(tasks_data:dict, model, args):
 
 
 def run_eval(infer_results, args):
+    """匹配答案, 对infer_results中不同task的结果调用不同的匹配函数
+    Params:
+        infer_result: dict[task(str), dict[subject(str), item(dict)]]
+    Returns:
+        score: dict[round{i}(str), dict[task(str), dict[subject(str), item(dict)]]]
+    """
     result = defaultdict(dict)
     for round_idx in range(1, args.rounds + 1):
         result[f"round{round_idx}"] = {}
         for task in args.tasks:
-            result[f"round{round_idx}"][task] = MATCH_TASK_ANSWER[task](infer_results[task], round_idx, args)
+            try:
+                result[f"round{round_idx}"][task] = MATCH_TASK_ANSWER[task](infer_results[task], round_idx, args)
+            except Exception as e:
+                logging.error(f"Error in task {task} round {round_idx}: {e}")
     return result
 
 
 def save_result(infer_result:dict, score:dict, args):
-    """
+    """保存infer_result和score
+    Params:
         infer_result: dict[task(str), dict[subject(str), item(dict)]]
         score: dict[round{i}(str), dict[task(str), dict[subject(str), item(dict)]]]
     """
-    # save infer texts
+    # 保存推理文本的可视化结果，输入和输出用'-'*20分割，每一条数据之间用'='*20分割
     if args.save_infer_texts:
         text_path = os.path.join(args.save_path, "infer_texts")
         for task in args.tasks:
@@ -227,7 +249,7 @@ def save_result(infer_result:dict, score:dict, args):
                             print("-" * 20, file=f)
                             print(output, file=f)
 
-    # save infer results in file
+    # 保存推理结果到json文件，每一条数据包含数据集原始信息、推理文本以及匹配答案详情（不同任务有区别）
     if args.save_infer_results:
         infer_result_path = os.path.join(args.save_path, "infer_results")
         os.makedirs(infer_result_path, exist_ok=True)
@@ -239,38 +261,41 @@ def save_result(infer_result:dict, score:dict, args):
                 with open(subject_filename, "w", encoding="utf-8") as f:
                     json.dump(infer_result[task][subject], f, ensure_ascii=False, indent=4)
 
-    # save evaluation result
+    # 保存评估结果
     summary_score = {}
     summary_score_with_subjects = {}
     for task in args.tasks:
-        task_result_with_subjects = {}
-        for subject in infer_result[task]:
-            subject_result_path = os.path.join(args.save_path, "eval_result", task)
-            subject_result = {}
-            for round_idx in range(1, args.rounds + 1):
-                subject_result[f"round{round_idx}"] = score[f"round{round_idx}"][task][subject]
-            os.makedirs(subject_result_path, exist_ok=True)
-            fn = os.path.join(subject_result_path, f"{subject}.json")
-            with open(fn, "w", encoding="utf-8") as f:
-                json.dump(subject_result, f, indent=4)
-            
-            if args.rounds == 1:
-                task_result_with_subjects[subject] = subject_result["round1"]
-            else:
-                task_result_with_subjects[subject] = {f"round{round_idx}": subject_result[f"round{round_idx}"] for round_idx in range(1, args.rounds + 1)}
+        try:
+            task_result_with_subjects = {}
+            for subject in infer_result[task]:
+                subject_result_path = os.path.join(args.save_path, "eval_result", task)
+                subject_result = {}
+                for round_idx in range(1, args.rounds + 1):
+                    subject_result[f"round{round_idx}"] = score[f"round{round_idx}"][task][subject]
+                os.makedirs(subject_result_path, exist_ok=True)
+                fn = os.path.join(subject_result_path, f"{subject}.json")
+                with open(fn, "w", encoding="utf-8") as f:
+                    json.dump(subject_result, f, indent=4)
+                
+                if args.rounds == 1:
+                    task_result_with_subjects[subject] = subject_result["round1"]
+                else:
+                    task_result_with_subjects[subject] = {f"round{round_idx}": subject_result[f"round{round_idx}"] for round_idx in range(1, args.rounds + 1)}
 
-        if args.rounds == 1:
-            task_result = score[f"round1"][task][task]
-        else:
-            task_result = {f"round{round_idx}": score[f"round{round_idx}"][task][task] for round_idx in range(1, args.rounds + 1)}
-        summary_score[task] = task_result
-        summary_score_with_subjects[task] = task_result_with_subjects
+            if args.rounds == 1:
+                task_result = score[f"round1"][task][task]
+            else:
+                task_result = {f"round{round_idx}": score[f"round{round_idx}"][task][task] for round_idx in range(1, args.rounds + 1)}
+            summary_score[task] = task_result
+            summary_score_with_subjects[task] = task_result_with_subjects
+        except Exception as e:
+            logging.error(f"Error in task {task}: {e}")
 
     with open(os.path.join(args.save_path, "summary.json"), "w", encoding="utf-8") as f:
-        json.dump(summary_score, f, indent=4)
+        json.dump(summary_score, f, indent=4)  # 保存分数总览
     with open(os.path.join(args.save_path, "summary_of_subjects.json"), "w", encoding="utf-8") as f:
-        json.dump(summary_score_with_subjects, f, indent=4, ensure_ascii=False)
-    print(json.dumps(summary_score, indent=4))
+        json.dump(summary_score_with_subjects, f, indent=4, ensure_ascii=False)  # 保存子学科详情
+    print(json.dumps(summary_score, indent=4))  # 同时将分数打印到终端
 
 
 def parse_args():
@@ -292,8 +317,10 @@ def parse_args():
     parser.add_argument("--save_infer_texts", action="store_true")
     parser.add_argument("--temp_file_path", type=str, default="temp_file")
     parser.add_argument("--no_timestamp", action="store_true")
+    parser.add_argument("--log_fn", type=str, default="log.log")
 
     # generate config
+    parser.add_argument("--tensor_parallel_size", type=int, default=1)
     parser.add_argument("--rounds", type=int, default=1)
     parser.add_argument("--seed", type=int, default=19260817)
     parser.add_argument("--use_cpu", action="store_true")

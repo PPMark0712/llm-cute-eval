@@ -29,7 +29,7 @@ def format_question(item, question_template, has_answer=False):
 
 def load_fewshot_prompt(data, config, language):
     fewshot_prompt = ""
-    for item in data[:config["num_fewshots"]]:
+    for item in data[1:1 + config["num_fewshots"]]:
         fewshot_prompt += format_question(item, config[f"question_template_{language}"], True)
     return fewshot_prompt
 
@@ -54,7 +54,7 @@ def load_data_xiezhi(args):
         task_data[subject] = []
         subject_path = os.path.join(xiezhi_path, "test", subject)
         subject_fn = os.path.join(subject_path, os.listdir(subject_path)[0])
-        subject_data = read_file(subject_fn, task_config["limit"])
+        subject_data = read_file(subject_fn, task_config["limit"] if "limit" in task_config else None)
         language = subject[-3:]
         if language == "chn":
             fewshot_prompt = load_fewshot_prompt(chn_fewshot_data, task_config, language)

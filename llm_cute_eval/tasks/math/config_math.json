@@ -1,0 +1,12 @@
+{
+    "instruction": "Please answer the following mathematical question. Please think step by step and provide the answer at the end. The answer should be in LaTeX format and enclosed in $\\boxed$\n\n",
+    "question_template": "Question: {question}\nAnswer:\nLet's think step by step.\n",
+    "num_fewshots": 2,
+    "limit": null,
+    "sampling_kwargs": {
+        "max_new_tokens": 1000,
+        "stop": [
+            "Question:"
+        ]
+    }
+}

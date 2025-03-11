@@ -1,5 +1,20 @@
 # llm-cute-eval代码说明文档
 
+## 目录
+
+- [模块介绍](#模块介绍)
+    - [任务总模块](#任务总模块)
+    - [任务模块](#任务模块)
+    - [model format模块](#model-format模块)
+- [主要数据结构](#主要数据结构)
+    - [任务数据结构](#任务数据结构)
+    - [推理结果数据结构](#推理结果数据结构)
+    - [分数数据结构](#分数数据结构)
+- [运行逻辑](#运行逻辑)
+- [数据集扩展](#数据集扩展)
+- [模型功能扩展](#模型功能扩展)
+
+
 ## 模块介绍
 
 ![功能模块图](assets/功能模块图.png)
@@ -180,12 +195,122 @@ config_newtask.json: 编写当前任务的配置
 在./lm_cute_eval/utils.py中将newtask加入TASK_LIST。
 
 
+## 模型功能扩展
+
+若需要扩展模型功能，比如推理行为，可以修改llm-cute-eval/model.py，添加一个新的模型类`MyModel`，并编写`MyModel.generate`函数，在函数中添加推理行为。
+
+```python
+class MyModel:
+    def __init__(self, args) -> None:
+        """初始化模型
+        Params:
+            args: 运行参数
+        Returns:
+            None
+        """
+        pass
+    
+    def generate(self, prompts, new_sampling_kwargs=None):
+        """推理
+        Params:
+            prompts[List[str]]: 输入的提示词
+            new_sampling_kwargs[Dict[str, Any]]: 新的采样参数
+        Returns:
+            generated_texts[List[str]]: 生成的文本
+        """
+        pass
+```
+
+然后在llm-cute-eval/model.py最下方的initialize_model函数中添加新的模型类，并更新model_type字典。
+
+```python
+def initialize_model(args):
+    model_type = {
+        "hf": HfModel,
+        "vllm": VllmModel,
+        "my_model": MyModel  # 新增一行
+    }
+    model = model_type[args.model_type](args)
+    return model
+```
+
+在编写运行命令时，将运行参数`--model_type`设置为`my_model`，即可使用新的自定义模型。
+
+## 对话格式扩展
+
+在llm-cute-eval/model_format文件夹中，新增文件new_format.py，并编写format函数：
+
+```python
+def format_prompt_new(query, history):
+    """
+    Params:
+        query[str]: 当前轮次的输入
+        history[List[Tuple[str, str]]]: 历史对话, 格式为[(query, response), (query, response), ...]
+    Returns:
+        prompt[str]: 格式化后的完整提示词
+    """
+    pass
+```
+
+然后在`llm-cute-eval/model_format/__init__.py`中，将new_format添加到`MODEL_FORMAT`字典中。
+
+```python
+from .default_format import format_prompt_default
+# ...
+from .new_format import format_prompt_new  # add
+
+MODEL_FORMAT = {
+    "default": format_prompt_default,
+    # ...
+    "new_format": format_prompt_new,  # add
+}
+```
 
 
 
 
+## 多轮对话扩展
 
+在llm-cute-eval/get_multiround_prompt.py中，可以修改多轮对话的格式，添加新的多轮对话。
 
+多轮对话的规则如下：
 
+已知执行完`load_data`函数后，单条数据的结构为：
 
+```python
+{
+    **item,
+    "instruction": str,
+    "fewshot_prompt": str,
+    "prompt_round1": str
+}
+```
+
+第一轮推理的输入为（default_format）：
+
+```python
+instruction + fewshot_prompt + prompt_round1
+```
+
+若第一轮推理结束后，单挑数据的结构会新增`infer_round1`字段，表示第一轮推理的输出。
+
+```python
+{
+    **item,
+    "instruction": str,
+    "fewshot_prompt": str,
+    "prompt_round1": str,
+    "infer_round1": str
+}
+```
+
+则第二轮的输入为：
+
+```python
+instruction + fewshot_prompt + prompt_round1 + "\n" + infer_round1
+```
+
+以此类推，可以添加新的多轮对话。
+
+若需要在多轮对话之间加入特殊token，可以新增model_format模块。
 

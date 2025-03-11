@@ -8,6 +8,7 @@ from .hellaswag.load_data_hellaswag import load_data_hellaswag
 from .humaneval.load_data_humaneval import load_data_humaneval
 from .iclformat.load_data_iclformat import load_data_iclformat
 from .icleval.load_data_icleval import load_data_icleval
+from .math.load_data_math import load_data_math
 from .mmlu.load_data_mmlu import load_data_mmlu
 from .mmluproplus.load_data_mmluproplus import load_data_mmluproplus
 from .rgb.load_data_rgb import load_data_rgb
@@ -27,6 +28,7 @@ LOAD_TASK_DATA = {
     "humaneval": load_data_humaneval,
     "iclformat": load_data_iclformat,
     "icleval": load_data_icleval,
+    "math": load_data_math,
     "mmlu": load_data_mmlu,
     "mmluproplus": load_data_mmluproplus,
     "rgb": load_data_rgb,
@@ -46,6 +48,7 @@ from .hellaswag.match_answer_hellaswag import match_answer_hellaswag
 from .humaneval.match_answer_humaneval import match_answer_humaneval
 from .iclformat.match_answer_iclformat import match_answer_iclformat
 from .icleval.match_answer_icleval import match_answer_icleval
+from .math.match_answer_math import match_answer_math
 from .mmlu.match_answer_mmlu import match_answer_mmlu
 from .mmluproplus.match_answer_mmluproplus import match_answer_mmluproplus
 from .rgb.match_answer_rgb import match_answer_rgb
@@ -65,6 +68,7 @@ MATCH_TASK_ANSWER = {
     "humaneval": match_answer_humaneval,
     "iclformat": match_answer_iclformat,
     "icleval": match_answer_icleval,
+    "math": match_answer_math,
     "mmlu": match_answer_mmlu,
     "mmluproplus": match_answer_mmluproplus,
     "rgb": match_answer_rgb,

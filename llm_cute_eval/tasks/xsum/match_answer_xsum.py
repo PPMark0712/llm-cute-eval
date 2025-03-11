@@ -4,7 +4,7 @@
 # def match_answer_xsum(infer_result, round_idx, args):
 #     similarity_sum = 0
 #     result = {}
-#     similarity_model = BGEM3FlagModel("/data2/dcy/downloads/model/BAAI/bge-m3", use_fp16=True)
+#     similarity_model = BGEM3FlagModel(args.emb_model_path, use_fp16=True)
 #     for item in infer_result["xsum"]:
 #         label_ids = similarity_model.encode(item["answer"], batch_size=256, max_length=1024, )['dense_vecs']    
 #         model_answer_ids = similarity_model.encode(item[f"infer_round{round_idx}"], batch_size=256, max_length=1024, )['dense_vecs']

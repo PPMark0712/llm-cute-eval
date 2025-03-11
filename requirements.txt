@@ -1,3 +1,4 @@
-torch
-transformers
-vllm
+torch=2.4.0
+transformers==4.46.2
+vllm==0.6.3
+latex2sympy2==1.1.0

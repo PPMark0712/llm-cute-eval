@@ -1,3 +1,13 @@
+import re
+
+def find_first_number(text):
+    pattern = r'\d+'
+    match = re.search(pattern, text)
+    if match:
+        return int(match.group(0))
+    return None
+
+
 def match_answer_xiezhi(infer_result, round_idx, args):
     task_config = args.tasks_config["xiezhi"]
     result = {}
@@ -5,7 +15,9 @@ def match_answer_xiezhi(infer_result, round_idx, args):
         correct_cnt = 0
         for item in infer_result[subject]:
             item[f"judge_round{round_idx}"] = False
-            if item["answer"] in item[f"infer_round{round_idx}"]:
+            label = find_first_number(item[f"infer_round{round_idx}"])
+            answer_label = item["options"].split("\n").index(item["answer"]) + 1
+            if label == answer_label or item["answer"] in item[f"infer_round{round_idx}"]:
                 correct_cnt += 1
                 item[f"judge_round{round_idx}"] = True
                 
